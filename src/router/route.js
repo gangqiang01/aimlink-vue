@@ -9,10 +9,6 @@ import  terminalList from '../components/terminal/list';
 import main from '@/components/home'
 let childRoute = [
     {
-        path: '',
-        redirect: "deviceList/list"
-    },
-    {
         path: 'batch/list',
         component: batchList,
         name: 'batchList'
@@ -46,6 +42,10 @@ let childRoute = [
         path: 'terminal/list',
         component: terminalList,
         name: 'terminal'
+    },
+    {
+        path: '*',
+        redirect:'device/list'
     }
 ]
 let route = [
@@ -67,6 +67,9 @@ let route = [
         //     path === '/main' ? next() : next(path)
         // },
         children: childRoute    
+    },{
+        path: '*',
+        redirect:'/'
     }
     
 ]

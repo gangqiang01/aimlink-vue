@@ -43,7 +43,6 @@
         },
         methods: {
             handleSubmit2(form) {
-                swal('','success','success');
                 if(this.loading) return;
                 this.loading = !this.loading
                 let data = {}
@@ -54,9 +53,10 @@
                 this.apiGet('/rmm/v1/sso/login', data).then((res) => {
                     console.log(res);
                     if(res.status == "passed"){
-                        this.apiGet("rmm/v1/accounts/login",data).then((res) =>{
-                            if(data.result){
-                                swal('','success','success');
+                        this.apiGet("rmm/v1/accounts/login").then((res) =>{
+                            if(res.result){
+                                Cookies.set("sessionId", data.sessionId, 1/12);
+                                this.$router.replace({name:'main'});
                             }
                         })
                     }

@@ -10,10 +10,13 @@ import Cookies from 'js-cookie'
 // import filter from './assets/js/filter'
 
 import 'element-ui/lib/theme-chalk/index.css'
+import 'font-awesome/css/font-awesome.css'
+import './assets/css/base.css';
+import './assets/css/global.css'
 
 window.axios = axios;
 window.swal = swal;
-window.cookies = Cookies;
+window.Cookies = Cookies;
 
 axios.defaults.baseURL = 'https://portal-rmm.wise-paas.com';
 axios.defaults.timeout = 1000 * 200

@@ -16,85 +16,58 @@ const apiMethods = {
                 axios.get(geturl).then((response) => {
                     resolve(response.data)
                     }, (response) => {
-                    reject(response)
+                    this.handleError(response)
                     _g.closeGlobalLoading()
 
                 })
             })
         },
         apiPost(url, data) {
-        return new Promise((resolve, reject) => {
-            axios.post(url, data).then((response) => {
-            resolve(response.data)
-            }).catch((response) => {
-            console.log('f', response)
-            resolve(response)
-            bus.$message({
-                message: '请求超时，请检查网络',
-                type: 'warning'
+            return new Promise((resolve, reject) => {
+                axios.post(url, data).then((response) => {
+                resolve(response.data)
+                }, (response) => {
+                    this.handleError(response)
+                    _g.closeGlobalLoading()
+                })
             })
-            })
-        })
         },
         apiPostfile(url, data, config) {
-        return new Promise((resolve, reject) => {
-            axios.post(url, data, config).then((response) => {
-            resolve(response.data)
-            }).catch((response) => {
-            console.log('f', response)
-            resolve(response)
-            bus.$message({
-                message: '请求超时，请检查网络',
-                type: 'warning'
+            return new Promise((resolve, reject) => {
+                axios.post(url, data, config).then((response) => {
+                resolve(response.data)
+                }, (response) => {
+                    this.handleError(response)
+                    _g.closeGlobalLoading()
+                })
             })
-            })
-        })
         },
         apiDelete(url, id) {
-        return new Promise((resolve, reject) => {
-            axios.delete(url + id).then((response) => {
-            resolve(response.data)
-            }, (response) => {
-            reject(response)
-            _g.closeGlobalLoading()
-            bus.$message({
-                message: '请求超时，请检查网络',
-                type: 'warning'
+            return new Promise((resolve, reject) => {
+                axios.delete(url + id).then((response) => {
+                    resolve(response.data)
+                }, (response) => {
+                    this.handleError(response)
+                    _g.closeGlobalLoading()
+                })
             })
-            })
-        })
         },
         apiPut(url, id, obj) {
-        return new Promise((resolve, reject) => {
-            axios.put(url + id, obj).then((response) => {
-            resolve(response.data)
-            }, (response) => {
-            _g.closeGlobalLoading()
-            bus.$message({
-                message: '请求超时，请检查网络',
-                type: 'warning'
+            return new Promise((resolve, reject) => {
+                axios.put(url + id, obj).then((response) => {
+                resolve(response.data)
+                }, (response) => {
+                    _g.closeGlobalLoading()
+                    this.handleError(response)
+                })
             })
-            reject(response)
-            })
-        })
-        },
-        handelResponse(res, cb, errCb) {
-        _g.closeGlobalLoading()
-        if (res.code == 200) {
-            cb(res.data)
-        } else {
-            if (typeof errCb == 'function') {
-            errCb()
-            }
-            this.handleError(res)
-        }
         },
         handleError(res) {
             if (res.code) {
                 switch (res.code) {
                     case 401:
                     swal("","Login expired","error").then(function(){
-                        window.location.href = "Login.html"
+                        this.$router.replace({path:'/'});
                     })
                     break
                 case 403:
