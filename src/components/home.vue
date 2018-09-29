@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="wrapper">
         <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;"> -->
-        <el-header class="nav-content">
+        <el-header class="nav-header">
             <ul class="nav-left pointer" @click="collapse()">
                 <li>
                     <i class="fa fa-bars" aria-hidden="true"></i>
@@ -11,25 +11,55 @@
                 </li>
             </ul>
             <ul class="nav-right">
-                <li> 
-                    
-                    <i class="fa fa-user-circle-o"></i>
-                </li>
                 <li>
-                    <el-badge :value=msgcount>
-                        <i class="fa fa-bell-o fa-x" aria-hidden="true"></i>
-                    </el-badge>
-                    
+                    <el-dropdown trigger="click" >
+                        <el-badge :value=msgcount class="el-dropdown-link">
+                            <i class="fa fa-bell-o fa-x header-bell" aria-hidden="true"></i>
+                        </el-badge> 
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item></el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
                 </li>
                 
+                <li> 
+                     <el-dropdown trigger="click" >
+                        <span class="el-dropdown-link">
+                            <i class="fa fa-user-circle-o header-user"></i> 
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item >
+                                <ul class="home_userinfo">
+                                    <li class="drapdown-user">
+                                        
+                                        <img src="@/assets/imgs/face_black.png" alt="">
+                                        <p> {{useremail}}</p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            <b>Last Accessed:</b>{{logintime}}
+                                        </p>
+                                        <p>
+                                            <b>Device Bound:</b>{{devicecount}}
+                                        </p>
+                                    </li>
+                                    <li class="drapdown-loginaction">
+                                        <el-button type="primary" class="fr" @click="loginout()">
+                                            {{loginstate}}
+                                        </el-button>
+                                    </li>
+                                </ul>
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>  
+                </li>
             </ul>
         </el-header>
        
             
         <!-- </el-radio-group> -->
-        <el-row>
-            <el-col :span="3">
-                <el-menu default-active="1-4-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+        <div class="body">
+                <el-menu default-active="1-4-1" class="el-menu-vertical-demo"  :collapse="isCollapse">
                     <el-submenu index="1">
                         <template slot="title">
                             <i class="fa fa-tasks" aria-hidden="true"></i>
@@ -73,76 +103,159 @@
                         </el-menu-item>
                     </router-link>
                 </el-menu>
-            </el-col>
-            <el-col :span="21">
+
+            <main class="content">
                 <transition name="fade" mode="out-in">
                     <router-view></router-view>
                 </transition>
-            </el-col>
-        </el-row>
-        
+            </main>
+        </div>   
     </div>
-    
 </template>
 
 
 
 <style lang='scss' scoped>
-    $nav-icon-color : #337ab7;  
-    .fade-enter-actice, .fade-leave-active{
-        transition: opacity .5s
-    } 
-    .fade-enter, .fade-leave-active{
-        opacity: 0;
-    }
-    .el-menu-vertical-demo:not(.el-menu--collapse) {
-        min-height: 400px;
-    }
-    .nav-content{
-        .nav-left{
-            padding:0;
-            margin:0;
-            li{ 
-                i{
-                    color : $nav-icon-color;
+
+    $nav-icon-color : #337ab7; 
+    $header-height : 60px;
+    $aside-width : 200px;
+    .wrapper{
+        display: -webkit-flex;
+        display:flex;
+        flex-flow: column nowrap;
+        .nav-header{
+            display: -webkit-flex;
+            display: flex;
+            flex-flow: row nowrap;
+            flex-basis: $header-height;
+            flex-shrink: 0;
+            align-items: center;
+            .nav-left{
+                padding:0;
+                margin:0;
+                display: flex;
+                justify-content: flex-start;
+                li{ 
+                    i{
+                        color : $nav-icon-color;
+                        font-size:1.5rem
+                    }
+                    margin-right: 1rem;
+                    
                 }
-                float:left;
-                margin-right: 1rem;
-                font-size:1.5rem
+                li:nth-child(2){
+                    margin-top:0.1rem
+                }
+            
             }
-            li:nth-child(2){
-                margin-top:0.1rem
+            .nav-right{
+                padding:0;
+                margin:0;
+                flex-grow:1;
+                display: flex;
+                justify-content: flex-end;
+                li{  
+                    i{
+                        color : $nav-icon-color;
+                        font-size:1.5rem;
+                    }
+                    margin-left: 2rem;
+                    width:1rem;
+                    
+                
+                    color:$nav-icon-color;
+                }
+                .home_userinfo{
+                    li:first-child{
+                        text-align: center;
+                    }
+                    li:nth-child(2){
+                        text-align: left;
+                    }
+            
+                }
             }
-           
         }
-        .nav-right{
-            padding:0;
-            margin:0;
-            li{  
-                float:right;
-                margin-left: 2rem;
-                width:1rem;
-                font-size:1.8rem;
-               
-                color:$nav-icon-color;
+    
+        .body{
+            display: -webkit-flex;
+            display:flex;
+            flex-flow: row nowrap;
+        }
+
+        .el-menu-vertical-demo:not(.el-menu--collapse) {
+            width: $aside-width;
+            min-height: 400px;
+            box-sizing: border-box;
+            
+        }
+
+        .content{
+            display: -webkit-flex;
+            display: flex;
+            flex-shrink: 1;
+            .fade-enter-actice, .fade-leave-active{
+                transition: opacity .5s
+            } 
+            .fade-enter, .fade-leave-active{
+                opacity: 0;
             }
         }
+
     }
+    
+    
+    
+    
+    
 </style>
 
 <script>
+import http from '../assets/js/http'
+
   export default {
     data() {
         return {
             isCollapse: false,
             img:"",
-            msgcount:''
+            msgcount:'',
+            loginstate:'Login Out',
+            useremail:'',
+            logintime:'',
+            devicecount:'',
         };
     },
     methods: {
         collapse(){
             this.isCollapse = this.isCollapse? false: true;
+        },
+        getuserinfo(){
+            var data = {};
+            data._now =  new Date().getTime();
+            var that = this
+            this.apiGet("rmm/v1/accounts/myself",data).then(function(data){
+                that.useremail =  data["accounts"][0].name
+                that.logintime = _g.unixToTime(data["accounts"][0].login_unix_ts);
+            })
+            var dvdata = {};
+            dvdata._ = new Date().getTime();
+            this.apiGet("rmm/v1/devices/own/status/number", dvdata).then(
+                function(data){
+                    that.devicecount = data.connected;
+                }
+            )
+            
+        },
+        loginout(){
+            Cookies.setCookie("sessionId", '', 0);
+            Cookies.setCookie('EIToken',"",0);
+            this.$router.replace('/');
         }
-    }
+    },
+    created(){
+        this.getuserinfo()
+    },
+    mixins: [http]
   }
 </script>

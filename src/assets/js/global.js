@@ -1,9 +1,15 @@
 const commonFn = {
+    unixToTime(unix){
+        var d = new Date(parseInt(unix));
+        var time = "";
+        var Day = d.getUTCDate();if(Day<10) Day = "0"+Day;var Month = (d.getUTCMonth()+1);if(Month<10) Month = "0"+Month;
+        var Hours = d.getHours();if(Hours<10) Hours = "0"+Hours;var Min = d.getUTCMinutes();if(Min<10) Min = "0"+Min;
+        var Sec = d.getUTCSeconds();if(Sec<10) Sec = "0"+Sec;
+        time = d.getUTCFullYear()+"/"+Month+"/"+Day+" "+Hours+":"+Min+":"+Sec;
+        return time;
+    },
     j2s(obj) {
         return JSON.stringify(obj)
-    },
-    shallowRefresh(name) {
-        router.replace({ path: '/refresh', query: { name: name }})
     },
     closeGlobalLoading() {
         setTimeout(() => {

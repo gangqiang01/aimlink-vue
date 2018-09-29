@@ -1,16 +1,20 @@
+import http from "./http"
+
 const loginstatus = function(){
-    if(Cookies.get("sessionId") != undefined){
-        console.log(page);
-        var url = "rmm/v1/accounts/login"
-       
-    }else{
-        this.$router.replace('/')  
-    }
+    var url = "rmm/v1/accounts/login"
+    return http.methods.apiGet(url).then(
+        function(data){
+            console.log(data.result);
+            if(data.result){
+                
+                return true;
+            }else{
+                return false;
+            }
+        }
+    )
 }
 
-const loginout = function(){
-    Cookies.remove("sessionId");
-    this.$router.replate('/');
-}
 
-export default {loginstatus,loginout};
+
+export default {loginstatus};

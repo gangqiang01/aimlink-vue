@@ -10,7 +10,7 @@
         </el-form-item>
         <el-checkbox v-model="checked" style="margin:0px 0px 35px 0px;">记住密码</el-checkbox>
         <el-form-item style="width:100%;">
-            <el-button type="primary" style="width:100%;" v-loading="loading" @click.native.prevent="handleSubmit2('form')">登录</el-button>
+            <el-button type="primary" style="width:100%;" v-loading="loading" @click.native.prevent="handleSubmit2()">登录</el-button>
         </el-form-item>
         </el-form>
     </div>
@@ -42,7 +42,7 @@
         }
         },
         methods: {
-            handleSubmit2(form) {
+            handleSubmit2() {
                 if(this.loading) return;
                 this.loading = !this.loading
                 let data = {}
@@ -55,7 +55,7 @@
                     if(res.status == "passed"){
                         this.apiGet("rmm/v1/accounts/login").then((res) =>{
                             if(res.result){
-                                Cookies.set("sessionId", data.sessionId, 1/12);
+                                // Cookies.setCookie("sessionId", data.sessionId, 60);
                                 this.$router.replace({name:'main'});
                             }
                         })
@@ -65,11 +65,11 @@
             }
         },
         mounted() {
-        window.addEventListener('keyup', (e) => {
-            if (e.keyCode === 13) {
-            this.handleSubmit2('form')
-            }
-        })
+            window.addEventListener('keyup', (e) => {
+                if (e.keyCode === 13) {
+                this.handleSubmit2()
+                }
+            })
         },
         mixins: [http]
     }

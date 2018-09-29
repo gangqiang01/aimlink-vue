@@ -1,3 +1,6 @@
+body{
+    margin:0;
+}
 .top-menu:hover {
 	cursor: pointer;
 	background: #324057;
