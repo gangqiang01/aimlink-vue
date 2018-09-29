@@ -8,6 +8,7 @@ import swal from 'sweetalert'
 import Cookies from './assets/js/cookie'
 import _g from './assets/js/global'
 import store from './vuex/store'
+import moment from 'moment';
 // import store from 'vuex/store'
 // import filter from './assets/js/filter'
 
@@ -21,6 +22,8 @@ window.swal = swal;
 window.Cookies = Cookies;
 window._g = _g;
 window.store = store;
+window.router = router;
+window.moment = moment;
 
 axios.defaults.baseURL = 'https://portal-rmm.wise-paas.com';
 axios.defaults.timeout = 1000 * 200

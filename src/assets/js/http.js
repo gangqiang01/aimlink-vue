@@ -14,85 +14,84 @@ const apiMethods = {
             var geturl = encodeURI(geturl);
             return new Promise((resolve, reject) => {
                 axios.get(geturl).then((response) => {
-                    resolve(response.data)
-                    }, (response) => {
-                    this.handleError(response)
-                    _g.closeGlobalLoading()
-
+                    resolve(response)
+                }).catch((err) => {
+                    resolve(err.response)
                 })
             })
         },
         apiPost(url, data) {
             return new Promise((resolve, reject) => {
                 axios.post(url, data).then((response) => {
-                resolve(response.data)
-                }, (response) => {
-                    this.handleError(response)
-                    _g.closeGlobalLoading()
+                    resolve(response)
+                }).catch((err) => {
+                    resolve(err.response)
                 })
             })
         },
         apiPostfile(url, data, config) {
             return new Promise((resolve, reject) => {
                 axios.post(url, data, config).then((response) => {
-                resolve(response.data)
-                }, (response) => {
-                    this.handleError(response)
-                    _g.closeGlobalLoading()
+                    resolve(response)
+                }).catch((err) => {
+                    resolve(err.response)
                 })
             })
         },
         apiDelete(url, id) {
             return new Promise((resolve, reject) => {
                 axios.delete(url + id).then((response) => {
-                    resolve(response.data)
-                }, (response) => {
-                    this.handleError(response)
-                    _g.closeGlobalLoading()
+                    resolve(response)
+                }).catch((err) => {
+                    resolve(err.response)
                 })
             })
         },
         apiPut(url, id, obj) {
             return new Promise((resolve, reject) => {
                 axios.put(url + id, obj).then((response) => {
-                resolve(response.data)
-                }, (response) => {
-                    _g.closeGlobalLoading()
-                    this.handleError(response)
+                    resolve(response)
+                }).catch((err) => {
+                    resolve(err.response)
                 })
             })
         },
+        handleResponse(res, cb, errcb){
+            _g.closeGlobalLoading();
+            if(res.status == 200){
+                cb(res.data)
+            }else{
+                if(typeof(errcb) == 'function'){
+                    errcb()
+                }
+                this.handleError(res)
+            }
+        },
         handleError(res) {
-            if (res.code) {
-                switch (res.code) {
-                    case 401:
-                    swal("","Login expired","error").then(function(){
-                        this.$router.replace({path:'/'});
-                    })
+            switch (res.status) {
+                case 401:
+                    swal("","Login expired","error")
                     break
                 case 403:
-                    if(JSON.parse(err.responseText).Description != undefined){
-                        swal("",JSON.parse(err.responseText).Description,"error")
-                    }else if(JSON.parse(err.responseText).Field != undefined){
-                        swal("",JSON.parse(err.responseText).Field,"error")
+                    if(JSON.parse(res.responseText).Description != undefined){
+                        swal("",JSON.parse(res.responseText).Description,"error")
+                    }else if(JSON.parse(res.responseText).Field != undefined){
+                        swal("",JSON.parse(res.responseText).Field,"error")
                     }else{
-                        console.log(JSON.parse(err.responseText));
+                        console.log(JSON.parse(res.responseText));
                     }
                     break
                 case 400:
-                    if(JSON.parse(err.responseText).Description != undefined){
-                        swal("",JSON.parse(err.responseText).Description,"error");
-                    }else if(JSON.parse(err.responseText).Field != undefined){
-                        swal("",JSON.parse(err.responseText).Field,"error");
+                    if(JSON.parse(res.responseText).Description != undefined){
+                        swal("",JSON.parse(res.responseText).Description,"error");
+                    }else if(JSON.parse(res.responseText).Field != undefined){
+                        swal("",JSON.parse(res.responseText).Field,"error");
                     }else{
-                        console.log(JSON.parse(err.responseText));
+                        console.log(JSON.parse(res.responseText));
                     }
                 
                 default :
-                    console.log(err)
-                }
-            } else {
-                console.log('default error')
+                    console.log(res)
             }
         },
     }

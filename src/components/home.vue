@@ -2,8 +2,8 @@
     <div class="wrapper">
         <!-- <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;"> -->
         <el-header class="nav-header">
-            <ul class="nav-left pointer" @click="collapse()">
-                <li>
+            <ul class="nav-left pointer" >
+                <li @click="collapse()">
                     <i class="fa fa-bars" aria-hidden="true"></i>
                 </li>
                 <li>
@@ -131,30 +131,26 @@
             flex-basis: $header-height;
             flex-shrink: 0;
             align-items: center;
+            justify-content: space-between;
             .nav-left{
                 padding:0;
                 margin:0;
                 display: flex;
-                justify-content: flex-start;
                 li{ 
                     i{
                         color : $nav-icon-color;
                         font-size:1.5rem
                     }
                     margin-right: 1rem;
-                    
+                    &:nth-child(2){
+                        margin-top: 0.1rem;
+                    } 
                 }
-                li:nth-child(2){
-                    margin-top:0.1rem
-                }
-            
             }
             .nav-right{
                 padding:0;
                 margin:0;
-                flex-grow:1;
                 display: flex;
-                justify-content: flex-end;
                 li{  
                     i{
                         color : $nav-icon-color;
@@ -165,16 +161,9 @@
                     
                 
                     color:$nav-icon-color;
+                    
                 }
-                .home_userinfo{
-                    li:first-child{
-                        text-align: center;
-                    }
-                    li:nth-child(2){
-                        text-align: left;
-                    }
-            
-                }
+                
             }
         }
     
@@ -202,9 +191,25 @@
                 opacity: 0;
             }
         }
-
     }
-    
+    .home_userinfo{
+        display: flex;
+        flex-direction: column;
+        min-width:3rem;
+        li{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            &:nth-child(2){
+                align-items: flex-start;
+                align-items: flex-start;
+            }
+            &:nth-child(3){
+                align-self: flex-end;
+            }
+        }
+    }
+
     
     
     
@@ -234,18 +239,20 @@ import http from '../assets/js/http'
             var data = {};
             data._now =  new Date().getTime();
             var that = this
-            this.apiGet("rmm/v1/accounts/myself",data).then(function(data){
-                that.useremail =  data["accounts"][0].name
-                that.logintime = _g.unixToTime(data["accounts"][0].login_unix_ts);
+            this.apiGet("rmm/v1/accounts/myself",data).then(function(res){
+                that.handleResponse(res, (res) => {
+                    that.useremail =  res["accounts"][0].name
+                    // that.logintime = _g.unixToTime(data["accounts"][0].login_unix_ts);
+                    that.logintime = moment(res["accounts"][0].login_unix_ts).format("YYYY-MM-DD HH:mm:ss")
+                })
             })
             var dvdata = {};
             dvdata._ = new Date().getTime();
-            this.apiGet("rmm/v1/devices/own/status/number", dvdata).then(
-                function(data){
-                    that.devicecount = data.connected;
-                }
-            )
-            
+            this.apiGet("rmm/v1/devices/own/status/number", dvdata).then((res) => {
+                that.handleResponse(res, (res) => {
+                    that.devicecount = res.connected;
+                })
+            })
         },
         loginout(){
             Cookies.setCookie("sessionId", '', 0);

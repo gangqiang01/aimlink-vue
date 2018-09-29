@@ -1,12 +1,11 @@
-import http from "./http"
+import http from "./http";
 
 const loginstatus = function(){
     var url = "rmm/v1/accounts/login"
     return http.methods.apiGet(url).then(
-        function(data){
-            console.log(data.result);
-            if(data.result){
-                
+        (res) => {
+            console.log(res);
+            if(res.data.result){
                 return true;
             }else{
                 return false;

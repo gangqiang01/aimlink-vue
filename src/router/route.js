@@ -54,18 +54,23 @@ let route = [
         path: '/',
         component: login,
         name: 'login',
-        beforeEnter (to, from, next) {
-            const path = redirectByAuth();
-            path === '/login' ? next() : next(path)
-        }
     },
     {
         path: '/main',
         name: 'main',
         component: main,
         beforeEnter: (to, from, next) => {
-            const path = redirectByAuth();
-            path === '/main' ? next() : next(path)
+            redirectByAuth().then((path) => {       
+                if(path === "/main"){
+                    next()
+                }else{
+                    swal('','login expires','error').then(() =>{
+                        next(path) 
+                    })
+                }
+   
+            });
+            
         },
         children: childRoute,
         redirect:'/main/device/list'    
@@ -78,12 +83,14 @@ let route = [
 ]
 
 function redirectByAuth(){
-    // console.log('route',auth.loginstatus());
-    auth.loginstatus().then(function(data){
+    console.log('route',auth.loginstatus());
+    return auth.loginstatus().then(function(data){
+        console.log(data);
+        
         if(data){
             return '/main';
         }else{
-            return '/login';
+            return '/';
         }
     })  
 }

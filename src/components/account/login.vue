@@ -51,15 +51,21 @@
                 data._now = Date.parse(new Date());
                 data.redirectUri = '172.21.73.144:8081';
                 this.apiGet('/rmm/v1/sso/login', data).then((res) => {
-                    console.log(res);
-                    if(res.status == "passed"){
-                        this.apiGet("rmm/v1/accounts/login").then((res) =>{
-                            if(res.result){
-                                // Cookies.setCookie("sessionId", data.sessionId, 60);
-                                this.$router.replace({name:'main'});
-                            }
-                        })
-                    }
+                    this.handleResponse(res, (res) => {
+                        if(res.status == "passed"){
+                            this.apiGet("rmm/v1/accounts/login").then((res) =>{
+                                this.handleResponse(res, (res => {
+                                    if(res.result){
+                                        // Cookies.setCookie("sessionId", data.sessionId, 60);
+                                        this.$router.replace({name:'main'});
+                                    }
+                                }))
+                                
+                            })
+                        }
+                    })
+                    
+                    
                 })
                
             }
