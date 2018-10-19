@@ -9,7 +9,6 @@ import Cookies from './assets/js/cookie'
 import _g from './assets/js/global'
 import store from './vuex/store'
 import moment from 'moment';
-// import store from 'vuex/store'
 // import filter from './assets/js/filter'
 
 import 'element-ui/lib/theme-chalk/index.css'
@@ -38,7 +37,7 @@ Vue.use(ElementUI)
 new Vue({
     el: '#app',
     router,
-    //   store,
+      store,
     //   filter:filter,
     template: '<router-view></router-view>'
 })

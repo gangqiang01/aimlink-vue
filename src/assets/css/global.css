@@ -7,7 +7,7 @@ ul{
 }
 a {
   text-decoration: none;
-  color: #c0ccda;
+  color: #428bca;
 }
 .pos-rel {
   position: relative;
@@ -178,11 +178,11 @@ a {
 .m-l-10 {
   margin-left: 10px !important;
 }
+.m-l-15 {
+    margin-left: 15px !important;
+  }
 .m-l-20 {
   margin-left: 20px !important;
-}
-.m-l-15 {
-  margin-left: 15px !important;
 }
 .m-l-30 {
   margin-left: 30px !important;
@@ -390,24 +390,29 @@ a {
 }
 
 .c-gray {
-  color: #ccc;
+  color: #ccc!important;;
 }
 .c-light-gray {
-  color: #99a9bf;
+  color: #99a9bf!important;;
 }
 .c-gra {
-  color: #C0CCDA;
+  color: #C0CCDA!important;;
 }
 .c-deep-blue {
-  color: #1F2D3D;
+  color: #1F2D3D!important;;
 }
 .c-blue {
-  color: #44B5DF;
+  color: #44B5DF!important;;
 }
 .c-black {
-  color: #333;
+  color: #333!important;;
 }
-
+.c-red {
+    color: red!important;
+}
+.c-green {
+    color: green!important;;
+}
 .fz-12 {
   font-size: 12px
 }

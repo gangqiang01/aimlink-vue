@@ -47,9 +47,9 @@ const apiMethods = {
                 })
             })
         },
-        apiPut(url, id, obj) {
+        apiPut(url, obj) {
             return new Promise((resolve, reject) => {
-                axios.put(url + id, obj).then((response) => {
+                axios.put(url, obj).then((response) => {
                     resolve(response)
                 }).catch((err) => {
                     resolve(err.response)

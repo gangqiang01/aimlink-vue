@@ -6,5 +6,5 @@ import route from './route.js'
 Vue.use(Router)
 
 export default new Router({
-  routes: route
+    routes: route
 })

@@ -8,6 +8,10 @@ const commonFn = {
         time = d.getUTCFullYear()+"/"+Month+"/"+Day+" "+Hours+":"+Min+":"+Sec;
         return time;
     },
+    shallowRefresh(name){
+        router.replace({path: '/refresh', query: {name: name}})
+    },
+
     j2s(obj) {
         return JSON.stringify(obj)
     },

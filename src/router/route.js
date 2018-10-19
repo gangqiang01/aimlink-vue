@@ -4,11 +4,17 @@ import controlList from '../components/control/list';
 import deviceList from '../components/device/list';
 import deviceAdd from '../components/device/add';
 import devicegroupList from '../components/devicegroup/list';
+import refresh from '../components/refresh'
 import  vncList from '../components/vnc/list';
 import  terminalList from '../components/terminal/list';
 import main from '@/components/home'
 import auth from '../assets/js/auth'
 let childRoute = [
+    {
+        path: '/refresh',
+        component: refresh,
+        name: "refresh"
+    },
     {
         path: 'batch/list',
         component: batchList,
@@ -27,7 +33,7 @@ let childRoute = [
     {
         path: 'device/add',
         component: deviceAdd,
-        name: 'devicceAdd'
+        name: 'deviceAdd'
     },
     {
         path: 'devicegroup/list',
