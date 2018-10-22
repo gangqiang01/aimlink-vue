@@ -9,16 +9,19 @@ a {
   text-decoration: none;
   color: #428bca;
 }
-.pos-rel {
+.p-r{
   position: relative;
 }
-.ovf-hd {
+.p-a{
+    position: absolute
+}
+.of-h {
   overflow: hidden
 }
-.ovf-auto {
+.of-a {
   overflow: auto
 }
-.ovf-y-auto {
+.of-y-au {
   overflow-y: auto
 }
 .fl {
@@ -402,7 +405,7 @@ a {
   color: #1F2D3D!important;;
 }
 .c-blue {
-  color: #44B5DF!important;;
+  color: #337ab7!important;;
 }
 .c-black {
   color: #333!important;;
@@ -434,4 +437,13 @@ a {
 
 .pointer {
   cursor: pointer
+}
+
+.cf::before,
+.cf::after{
+    content:"";
+    display:block;
+    clear:both;
+    visibility:hidden;
+    height:0
 }

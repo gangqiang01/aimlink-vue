@@ -50,7 +50,7 @@
                                         </p>
                                     </li>
                                     <li class="drapdown-loginaction">
-                                        <el-button type="primary" class="fr" @click="loginout()">
+                                        <el-button type="primary" size="small" class="fr" @click="loginout()">
                                             {{loginstate}}
                                         </el-button>
                                     </li>
@@ -65,45 +65,45 @@
             
         <!-- </el-radio-group> -->
         <div class="body">
-            <el-menu default-active="1-4-1" class="el-menu-vertical-demo"  :collapse="isCollapse">
-                <el-submenu index="1">
+            <el-menu :default-active="activeItem" class="el-menu-vertical-demo"  :collapse="isCollapse">
+                <el-submenu index="device">
                     <template slot="title">
                         <i class="fa fa-tasks" aria-hidden="true"></i>
                         <span slot="title">Device management</span>
                     </template>
                     <el-menu-item-group>
                         <router-link to="/main/device/list">
-                            <el-menu-item index="1-1">
+                            <el-menu-item index="deviceList">
                                     Device List
                             </el-menu-item>
                         </router-link>
                         <router-link to="/main/devicegroup/list">
-                            <el-menu-item index="1-2"> 
+                            <el-menu-item index="devicegroupList"> 
                                     Device Group
                             </el-menu-item>
                         </router-link>
                     </el-menu-item-group>
                 </el-submenu>
                 <router-link to="/main/control/list">
-                    <el-menu-item index="2">
+                    <el-menu-item index="controlList">
                         <i class="fa fa-window-maximize" aria-hidden="true"></i>
                         <span slot="title">Remote Control</span>
                     </el-menu-item>
                 </router-link> 
                 <router-link to="/main/batch/list">
-                    <el-menu-item index="3">
-                            <i class="fa fa-window-restore" aria-hidden="true"></i>
-                            <span slot="title">Batch Control</span>
+                    <el-menu-item index="batchList">
+                        <i class="fa fa-window-restore" aria-hidden="true"></i>
+                        <span slot="title">Batch Control</span>
                     </el-menu-item>
                 </router-link>  
-                <router-link to="/main/kvm/list">
-                    <el-menu-item index="4">
-                            <i class="fa fa-desktop" aria-hidden="true"></i>
-                            <span slot="title">KVM</span>
+                <router-link to="/main/vnc/list">
+                    <el-menu-item index="vncList">
+                        <i class="fa fa-desktop" aria-hidden="true"></i>
+                        <span slot="title">KVM</span>
                     </el-menu-item>
                 </router-link>
                 <router-link to="/main/terminal/list">
-                    <el-menu-item index="5">
+                    <el-menu-item index="terminalList">
                         <i class="fa fa-terminal" aria-hidden="true"></i>
                         <span slot="title">Terminal</span>
                     </el-menu-item>
@@ -248,20 +248,18 @@
             getuserinfo(){
                 var data = {};
                 data._now =  new Date().getTime();
-                var that = this
-                this.apiGet("rmm/v1/accounts/myself",data).then(function(res){
-                    that.handleResponse(res, (res) => {
+                this.apiGet("rmm/v1/accounts/myself",data).then((res) => {
+                    this.handleResponse(res, (res) => {
                         console.log(res);
-                        that.useremail =  res["accounts"][0].name
-                        // that.logintime = _g.unixToTime(data["accounts"][0].login_unix_ts);
-                        that.logintime = moment(res["accounts"][0].login_unix_ts).format("YYYY-MM-DD HH:mm:ss")
+                        this.useremail =  res["accounts"][0].name
+                        this.logintime = moment(res["accounts"][0].login_unix_ts).format("YYYY-MM-DD HH:mm:ss")
                     })
                 })
                 var dvdata = {};
                 dvdata._ = new Date().getTime();
                 this.apiGet("rmm/v1/devices/own/status/number", dvdata).then((res) => {
-                    that.handleResponse(res, (res) => {
-                        that.devicecount = res.connected;
+                    this.handleResponse(res, (res) => {
+                        this.devicecount = res.connected;
                     })
                 })
             },
@@ -303,6 +301,12 @@
                 showLoading: "globalLoading"
             })
 
+        },
+
+        watch: {
+            $route(to, from){
+                this.activeItem = to.name;
+            }
         },
         mixins: [http]
     }

@@ -1,9 +1,9 @@
 <template>
     <div>
-        <h3><i class="fa fa-windows"></i> Add Device</h3>
-        <p>All Unassigned Devices</p>
+        <p class="header-line"><i class="fa fa-plus-square-o c-blue m-r-10"></i> Add Device</h3>
+        <p class="panel-header">All Unassigned Devices</p>
         <el-table
-            :data="groupTableData"
+            :data="deviceList"
             tooltip-effect="dark"
             style="width: 100%"
             @selection-change="handleSelectionChange">
@@ -25,30 +25,62 @@
             min-width="120">
             </el-table-column>
         </el-table>
-        <div class="m-t-10 fr">
-            <btn-group :selectData="multipleTable"  :isAdd="true" :isDelete="false"></btn-group>
-            <!-- <el-pagination
+        <div class="m-t-10 cf">
+            <el-pagination class="fr"
             @current-change="handleCurrentChange"
             layout="prev, pager, next"
             :page-size="limit"
             :current-page="currentPage"
             :total="dataCount"
             v-show="isshow"
+            background
             >
-            </el-pagination> -->
+            </el-pagination>
+            
         </div>
+        <div  class="m-t-10 cf">
+            <el-button v-loading="addLoading" size="small" @click="dialogFormVisible = true" type="primary" class="m-t-10 fr">Add</el-button>
+            <el-dialog title="Select device group you want to add" :visible.sync="dialogFormVisible">
+                <el-form :model="form">
+                    <span class="m-r-10">Device Group:</span>
+                    <el-select v-model="form.selectGroup">
+                        <el-option
+                        v-for="item in groupOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="dialogFormVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="addDevice">确 定</el-button>
+                </div>
+            </el-dialog>
+        </div>
+        
     </div>
 </template>
 
 <script>
     import http from '@/assets/js/http'
-    import btnGroup from '@/common/btn-group'
 
     export default{
         data(){
             return {
-                groupTableData: [],
-                multipleTable: []
+                deviceData: [],
+                deviceList: [],
+                multipleTable: [],
+                addLoading: false,
+                groupOptions: [],
+                dialogFormVisible: false,
+                limit: 10,
+                dataCount: null,
+                currentPage: 1,
+                isshow: false,
+                form:{
+                    selectGroup: ''
+                }
             }
         },
         methods:{
@@ -62,8 +94,14 @@
                 _g.openGlobalLoading();
                 this.apiGet('rmm/v1/devices/unassigned', devgetdata).then((data) => {
                     this.handleResponse(data, (res) =>{
-                        this.groupTableData = res.devices;
-                        console.log(this.groupTableData);
+                        this.deviceData = res.devices
+                        this.dataCount = res.devices.length;
+                        if(this.dataCount > 0){
+                            this.deviceList = res.devices.slice(0, this.limit);
+                            this.isshow = this.dataCount > this.limit;
+                        }else{
+                            console.log("unassigndevicecount is null")
+                        }
                     })
                 })
 
@@ -73,18 +111,75 @@
                 this.multipleTable = val;
             },
 
-            // handleCurrentChange(currentPage){
-            //     this.currentPage = currentPage;
-            //     this.deviceTableData = this.deviceTableData.slice((currentPage-1)*limit,currentPage*limit)
-            // }
-        },
+            getDeviceGroup(){
+                
+                let devGetData = {};
+                devGetData.pageSize = 1000;
+                devGetData.no = 1;
+                devGetData.orderType = "aid";
+                devGetData.like = "";
+                devGetData._ = new Date().getTime();
+                this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
+                    this.handleResponse(data, (res) => {
+                        var accountId = res.accounts[0].aid
+                        var groupGetData = {};
+                        groupGetData._ = new Date().getTime();
+                        this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
+                            this.handleResponse(data, (res) => {
+                                var groupData = res.accounts[0].groups
+                                console.log(groupData)
+                                if(groupData.length != 0){
+                                    var groupOptionsData = [];
+                                   groupData.forEach(function(val){
+                                       groupOptionsData.push({value: val.gid, label:val.name})
+                                   }) 
+                                   this.selectValue = groupData[0].gid;
+                                   this.groupOptions = groupOptionsData
+                                }
+                            })
+                        })
+                    })
+                    
+                })
+            },
 
-        components:{
-            btnGroup
+            addDevice(){
+                this.dialogFormVisible = false;
+                var adddata = {};
+                adddata.devices = [];
+                let groupid = this.form.selectGroup;
+                if(this.multipleTable.length ==0){
+                    swal("","Please select Device",'info')
+                    return;
+                }
+                
+                this.multipleTable.forEach((val, i) => {
+                    adddata.devices[i] = {};
+                    adddata.devices[i].did = val.did;
+                    adddata.devices[i].groupIds = [];
+                    adddata.devices[i].groupIds[0] = groupid+"";
+                    this.apiPut("rmm/v1/devices", adddata).then((data) => {
+                        this.handleResponse(data, (res) => {
+                            if(res.result){
+                                swal("","Add device successfully", 'success').then((val)=>{
+                                    if(val){
+                                        router.replace({name: "deviceList"})
+                                    }
+                                })
+                            }
+                        })
+                    })
+                })
+            },
+            handleCurrentChange(currentPage){
+                this.currentPage = currentPage;
+                this.deviceList = this.deviceData.slice((currentPage-1)*this.limit,currentPage*this.limit)
+            }
         },
 
         created(){
             this.getUnassignedDevices();
+            this.getDeviceGroup();
         },
 
         mixins:[http]

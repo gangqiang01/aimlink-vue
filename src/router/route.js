@@ -28,7 +28,7 @@ let childRoute = [
     {
         path: 'device/list',
         component: deviceList,
-        name: 'deivceList'
+        name: 'deviceList'
     },
     {
         path: 'device/add',
@@ -48,7 +48,7 @@ let childRoute = [
     {
         path: 'terminal/list',
         component: terminalList,
-        name: 'terminal'
+        name: 'terminalList'
     },
     {
         path: '*',

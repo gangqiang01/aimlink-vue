@@ -38,9 +38,9 @@ const apiMethods = {
                 })
             })
         },
-        apiDelete(url, id) {
+        apiDelete(url) {
             return new Promise((resolve, reject) => {
-                axios.delete(url + id).then((response) => {
+                axios.delete(url).then((response) => {
                     resolve(response)
                 }).catch((err) => {
                     resolve(err.response)
@@ -70,7 +70,12 @@ const apiMethods = {
         handleError(res) {
             switch (res.status) {
                 case 401:
-                    swal("","Login expired","error")
+                    swal("","Login expired","error").then((val) =>{
+                        if(val){
+                            router.replace("/");
+                        }
+                    });
+                    
                     break
                 case 403:
                     if(JSON.parse(res.responseText).Description != undefined){
