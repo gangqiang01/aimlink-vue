@@ -85,7 +85,7 @@
         },
         methods:{
             getUnassignedDevices(){
-                var devgetdata = {};
+                let devgetdata = {};
                 devgetdata.pageSize = 1000;
                 devgetdata.no = 1;
                 devgetdata.orderType = "did";
@@ -121,15 +121,15 @@
                 devGetData._ = new Date().getTime();
                 this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
                     this.handleResponse(data, (res) => {
-                        var accountId = res.accounts[0].aid
-                        var groupGetData = {};
+                        let accountId = res.accounts[0].aid
+                        let groupGetData = {};
                         groupGetData._ = new Date().getTime();
                         this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
                             this.handleResponse(data, (res) => {
-                                var groupData = res.accounts[0].groups
+                                let groupData = res.accounts[0].groups
                                 console.log(groupData)
                                 if(groupData.length != 0){
-                                    var groupOptionsData = [];
+                                    let groupOptionsData = [];
                                    groupData.forEach(function(val){
                                        groupOptionsData.push({value: val.gid, label:val.name})
                                    }) 
@@ -145,7 +145,7 @@
 
             addDevice(){
                 this.dialogFormVisible = false;
-                var adddata = {};
+                let adddata = {};
                 adddata.devices = [];
                 let groupid = this.form.selectGroup;
                 if(this.multipleTable.length ==0){

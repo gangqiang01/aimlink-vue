@@ -29,17 +29,19 @@
                 <el-table-column
                 label="Device ID"
                 prop="gid"
-                min-width="120">
+                min-width="120"
+                sortable>
                 </el-table-column>
                 <el-table-column
                 label="Group Name"
                 prop="name"
-                min-width="120">
+                min-width="120"
+                sortable>
                 </el-table-column>
                 <el-table-column
                 label="Create Time"
                 min-width="120">
-                    <template scope="scope">
+                    <template slot-scope="scope">
                         <div>
                             {{scope.row.create_unix_ts|time}}
                         </div>
@@ -136,8 +138,8 @@
                 devGetData._ = new Date().getTime();
                 this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
                     this.handleResponse(data, (res) => {
-                        var accountId = res.accounts[0].aid
-                        var groupGetData = {};
+                        let accountId = res.accounts[0].aid
+                        let groupGetData = {};
                         groupGetData._ = new Date().getTime();
                         this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
                             this.handleResponse(data, (res) => {
@@ -168,7 +170,7 @@
                             this.handleResponse(data, (res) => {
                                 if(res.result){
                                     swal("","Delete group successfully",'success').then(() => {
-                                        this.getAllDevices();
+                                        this.getDeviceGroup();
                                     })
                                 }
                             })

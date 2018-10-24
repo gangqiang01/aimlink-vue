@@ -6,7 +6,7 @@
         <div class="m-t-20">
             <div class="panel-header">
                 Device Group:
-                <el-select v-model="selectValue">
+                <el-select v-model="selectValue" size="small">
                     <el-option
                     v-for="item in groupOptions"
                     :key="item.value"
@@ -30,13 +30,15 @@
                 <el-table-column
                 prop="name"
                 label="Device Name"
-                min-width="120">
+                min-width="120"
+                sortable>
                 </el-table-column>
 
                 <el-table-column
                 prop="agentid"
                 label="Agent ID"
-                min-width="120">
+                min-width="120"
+                sortable>
                 </el-table-column>
                 <el-table-column
                 prop="version"
@@ -121,15 +123,15 @@
                 devGetData._ = new Date().getTime();
                 this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
                     this.handleResponse(data, (res) => {
-                        var accountId = res.accounts[0].aid
-                        var groupGetData = {};
+                        let accountId = res.accounts[0].aid
+                        let groupGetData = {};
                         groupGetData._ = new Date().getTime();
                         this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
                             this.handleResponse(data, (res) => {
-                                var groupData = res.accounts[0].groups
+                                let groupData = res.accounts[0].groups
                                 console.log(groupData)
                                 if(groupData.length != 0){
-                                    var groupOptionsData = [];
+                                    let groupOptionsData = [];
                                    groupData.forEach(function(val){
                                        groupOptionsData.push({value: val.gid, label:val.name})
                                    }) 
@@ -165,7 +167,7 @@
 
             confirmDelete(row){ 
                 console.log("rowdata:",row);
-                var dddata = {};
+                let dddata = {};
                 dddata.devices = [];
                 dddata.devices[0] = {"did": row.did, 'groupIds': []};
                 swal({
@@ -216,7 +218,7 @@
                 }).then((willDelete) => {
                     this.deleteLoading = !this.deleteLoading;
                     if(willDelete){
-                        var dddata = {};
+                        let dddata = {};
                         dddata.devices = [];
 
                         this.multipleTable.forEach((value, i) => {

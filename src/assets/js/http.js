@@ -1,17 +1,18 @@
 const apiMethods = {
     methods: {
         apiGet(url, object) {
+            let geturl
             if(object != undefined){
-                var array = [],myurl;
+               let array = [],myurl;
                 for(var key in object){
                     array.push(key+"="+object[key]);
                 }
-                var parameter = array.join("&")
-                var geturl = url+ "?" + parameter;
+               let parameter = array.join("&")
+                geturl = url+ "?" + parameter;
             }else{
-                var geturl = url;
+               geturl = url;
             }
-            var geturl = encodeURI(geturl);
+            geturl = encodeURI(geturl);
             return new Promise((resolve, reject) => {
                 axios.get(geturl).then((response) => {
                     resolve(response)
@@ -55,6 +56,41 @@ const apiMethods = {
                     resolve(err.response)
                 })
             })
+        },
+
+        //repoapi
+        repoApiGet(myurl, object, token){
+           let array = [];
+           let url;
+            if(object != undefined){
+                for(key in object){
+                    array.push(key+"="+object[key]);
+                }
+               let parameter = array.join("&")
+                geturl = myurl+ "?" + parameter;
+            }else{
+               geturl = myurl;
+            }
+        
+            geturl = encodeURI(myurl);
+            return new Promise((resolve, reject) => {
+                axios.defaults.headers['accesstoken'] = token;
+                axios.get(geturl).then((response) => {
+                    resolve(response)
+                }).catch((err) => {
+                    resolve(err.response)
+                });
+            })
+        },
+        
+        repoApiPost(url, data){
+            return new Promise(function(resolve, reject){
+                axios.post(url, data).then((response) => {
+                    resolve(response)
+                }).catch((err) => {
+                    resolve(err.response)
+                })
+           })
         },
         handleResponse(res, cb, errcb){
             _g.closeGlobalLoading();

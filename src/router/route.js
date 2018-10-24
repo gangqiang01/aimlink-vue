@@ -1,54 +1,94 @@
-import login from '../components/account/login';
-import batchList from '../components/batch/list';
-import controlList from '../components/control/list';
-import deviceList from '../components/device/list';
-import deviceAdd from '../components/device/add';
-import devicegroupList from '../components/devicegroup/list';
-import refresh from '../components/refresh'
-import  vncList from '../components/vnc/list';
-import  terminalList from '../components/terminal/list';
+import login from '@/components/account/login';
+import batchList from '@/components/batch/list';
+import appControl from '@/components/control/appcontrol';
+import monitor from '@/components/control/monitor';
+import remoteControl from '@/components/control/remotecontrol'
+import deviceList from '@/components/device/list';
+import deviceAdd from '@/components/device/add';
+import devicegroupList from '@/components/devicegroup/list';
+import refresh from '@/components/refresh'
+import vncList from '@/components/vnc/list';
+import terminalList from '@/components/terminal/list';
 import main from '@/components/home'
-import auth from '../assets/js/auth'
+import auth from '@/assets/js/auth'
 let childRoute = [
     {
         path: '/refresh',
         component: refresh,
-        name: "refresh"
+        name: "refresh",
+        meta:{}
     },
     {
         path: 'batch/list',
         component: batchList,
-        name: 'batchList'
+        name: 'batchList',
+        meta:{
+            menuName: "batchList"
+        }
     },
     {
-        path: 'control/list',
-        component: controlList,
-        name: 'controlList'
+        path: 'control/appcontrol',
+        component: appControl,
+        name: 'appControl',
+        meta: {
+            menuName: "control-appcontrol"
+        }
+    },
+    {
+        path: 'control/monitor',
+        component: monitor,
+        name: 'monitor',
+        meta: {
+            menuName: 'control-monitor'
+        }
+    },
+    {
+        path: 'control/remotecontrol',
+        component: remoteControl,
+        name: 'remoteControl',
+        meta: {
+            menuName: 'control-remotecontrol'
+        }
     },
     {
         path: 'device/list',
         component: deviceList,
-        name: 'deviceList'
+        name: 'deviceList',
+        meta: {
+            menuName: 'device-devicelist'
+        }
     },
     {
         path: 'device/add',
         component: deviceAdd,
-        name: 'deviceAdd'
+        name: 'deviceAdd',
+        meta: {
+            menuName: 'deviceAdd'
+        }
     },
     {
         path: 'devicegroup/list',
         component: devicegroupList,
-        name: 'devicegroupList'
+        name: 'devicegroupList',
+        meta: {
+            menuName: 'device-grouplist'
+        }
     },
     {
         path: 'vnc/list',
         component: vncList,
-        name: 'vncList'
+        name: 'vncList',
+        meta: {
+            menuName: 'vncList'
+        }
     },
     {
         path: 'terminal/list',
         component: terminalList,
-        name: 'terminalList'
+        name: 'terminalList',
+        meta: {
+            menuName: 'terminalList'
+        }
     },
     {
         path: '*',

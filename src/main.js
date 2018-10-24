@@ -13,8 +13,8 @@ import filter from './assets/js/filter'
 
 import 'element-ui/lib/theme-chalk/index.css'
 import 'font-awesome/css/font-awesome.css'
-import './assets/css/base.css';
-import './assets/css/global.css';
+import './assets/css/base.scss';
+import './assets/css/global.scss';
 
 window.axios = axios;
 window.swal = swal;

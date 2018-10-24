@@ -65,31 +65,54 @@
             
         <!-- </el-radio-group> -->
         <div class="body">
-            <el-menu :default-active="activeItem" class="el-menu-vertical-demo"  :collapse="isCollapse">
-                <el-submenu index="device">
+            <el-menu 
+            :default-active="activeItem" 
+            background-color="#222d32"
+            text-color="#fff"
+            active-text-color="#3c8dbc"
+            class="el-menu-vertical-demo"  
+            :collapse="isCollapse">
+                <el-submenu index="device" >
                     <template slot="title">
                         <i class="fa fa-tasks" aria-hidden="true"></i>
                         <span slot="title">Device management</span>
                     </template>
                     <el-menu-item-group>
                         <router-link to="/main/device/list">
-                            <el-menu-item index="deviceList">
+                            <el-menu-item index="device-devicelist">
                                     Device List
                             </el-menu-item>
                         </router-link>
                         <router-link to="/main/devicegroup/list">
-                            <el-menu-item index="devicegroupList"> 
+                            <el-menu-item index="device-grouplist"> 
                                     Device Group
                             </el-menu-item>
                         </router-link>
                     </el-menu-item-group>
                 </el-submenu>
-                <router-link to="/main/control/list">
-                    <el-menu-item index="controlList">
-                        <i class="fa fa-window-maximize" aria-hidden="true"></i>
-                        <span slot="title">Remote Control</span>
-                    </el-menu-item>
-                </router-link> 
+                 <el-submenu index="control" >
+                    <template slot="title">
+                        <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
+                        <span slot="title">Device Control</span>
+                    </template>
+                    <el-menu-item-group>
+                        <router-link to="/main/control/monitor">
+                            <el-menu-item index="control-monitor">
+                                Device monitor
+                            </el-menu-item>
+                        </router-link>
+                        <router-link to="/main/control/remotecontrol">
+                            <el-menu-item index="control-remotecontrol"> 
+                                Remote Control                                   
+                            </el-menu-item>
+                        </router-link>
+                        <router-link to="/main/control/appcontrol">
+                            <el-menu-item index="control-appcontrol"> 
+                                App Control
+                            </el-menu-item>
+                        </router-link>
+                    </el-menu-item-group>
+                </el-submenu>
                 <router-link to="/main/batch/list">
                     <el-menu-item index="batchList">
                         <i class="fa fa-window-restore" aria-hidden="true"></i>
@@ -122,16 +145,18 @@
 
 
 <style lang='scss' scoped>
-
-    $nav-icon-color : #337ab7; 
-    $header-height : 60px;
-    $aside-width : 200px;
+    @import "../assets/css/colors";
+    $nav-icon-color : $primary-color; 
+    $header-height : 70px;
+    $aside-width : 220px;
     .wrapper{
-        padding:10px;
         display: -webkit-flex;
         display:flex;
+        height: 100vh;
         flex-flow: column nowrap;
         .nav-header{
+            background: $lightgray-color;
+            border-bottom: 3px solid $purple-color;
             display: -webkit-flex;
             display: flex;
             flex-flow: row nowrap;
@@ -163,10 +188,7 @@
                     }
                     margin-left: 2rem;
                     width:1rem;
-                    
-                
                     color:$nav-icon-color;
-                    
                 }
                 
             }
@@ -174,15 +196,17 @@
     
         .body{
             display: -webkit-flex;
+            flex:1;
             display:flex;
             flex-flow: row nowrap;
         }
 
         .el-menu-vertical-demo:not(.el-menu--collapse) {
             flex: 0 0 $aside-width;
-            min-height: 400px;
+            // background-color:$black-color;
+            height: 100%;
             box-sizing: border-box;
-            
+
         }
 
         .content{
@@ -212,11 +236,7 @@
                 align-self: flex-end;
             }
         }
-    }
-
-    
-    
-    
+    } 
     
 </style>
 
@@ -239,6 +259,7 @@
                 isshow: false,
                 allowleft: "fa fa-long-arrow-left",
                 allowright: "fa fa-bars",
+                activeItem: 'device-devicelist'
             };
         },
         methods: {
@@ -287,6 +308,7 @@
         },
 
         created(){
+            this.activeItem = this.$route.meta.menuName;
             this.getuserinfo();
             this.websocket();
         },
@@ -305,7 +327,7 @@
 
         watch: {
             $route(to, from){
-                this.activeItem = to.name;
+                this.activeItem = to.meta.menuName;
             }
         },
         mixins: [http]

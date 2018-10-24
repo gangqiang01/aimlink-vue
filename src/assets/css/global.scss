@@ -1,3 +1,5 @@
+@import './colors';
+
 ul li {
   list-style: none
 }
@@ -7,7 +9,7 @@ ul{
 }
 a {
   text-decoration: none;
-  color: #428bca;
+  color: $primary-color;
 }
 .p-r{
   position: relative;
@@ -40,44 +42,32 @@ a {
 .w-100 {
   width: 100px !important;
 }
-.w-115 {
+.w-150 {
   width: 115px !important;
 }
-.w-150 {
+.w-175 {
   width: 150px !important;
-}
-.w-180 {
-  width: 180px !important;
 }
 .w-200 {
   width: 200px !important;
 }
-.w-230 {
+.w-250 {
   width: 230px !important;
-}
-.w-295 {
-  width: 295px !important;
 }
 .w-300 {
   width: 300px !important;
 }
-.w-310 {
-  width: 310px !important;
+.w-350 {
+  width: 350px !important;
 }
 .w-400 {
   width: 400px !important;
-}
-.w-450 {
-  width: 450px !important;
 }
 .w-500 {
   width: 500px !important;
 }
 .w-600 {
   width: 600px !important;
-}
-.w-650 {
-  width: 650px !important;
 }
 .w-700 {
   width: 700px !important;
@@ -88,9 +78,6 @@ a {
 .w-900 {
   width: 900px !important;
 }
-.w-950 {
-  width: 950px !important;
-}
 .w-1000 {
   width: 1000px !important;
 }
@@ -98,17 +85,17 @@ a {
   width: 100% !important;
 }
 
-.h-28 {
-  height: 28px !important;
-  line-height: 28px !important;
+.h-20 {
+  height: 20px !important;
+  line-height: 20px !important;
 }
 .h-30 {
   height: 30px !important;
   line-height: 30px !important;
 }
-.h-36 {
-  height: 36px !important;
-  line-height: 36px !important;
+.h-35 {
+  height: 35px !important;
+  line-height: 35px !important;
 }
 .h-40 {
   height: 40px !important;
@@ -127,9 +114,6 @@ a {
 }
 .h-150 {
   height: 150px !important;
-}
-.h-190 {
-  height: 190px !important;
 }
 .h-200 {
   height: 200px !important;
@@ -190,9 +174,7 @@ a {
 .m-l-30 {
   margin-left: 30px !important;
 }
-.m-l-50 {
-  margin-left: 50px !important;
-}
+
 .m-r-5 {
   margin-right: 5px !important;
 }
@@ -221,17 +203,8 @@ a {
   margin-bottom: 30px !important;
 }
 
-.p-t-0 {
-  padding-top: 0px !important;
-}
-.p-t-3 {
-  padding-top: 3px !important;
-}
 .p-t-5 {
   padding-top: 5px !important;
-}
-.p-t-6 {
-  padding-top: 6px !important;
 }
 .p-t-10 {
   padding-top: 10px !important;
@@ -245,26 +218,12 @@ a {
 .p-t-30 {
   padding-top: 30px !important;
 }
-.p-t-40 {
-  padding-top: 40px !important;
-}
-.p-t-50 {
-  padding-top: 50px !important;
-}
-.p-l-0 {
-  padding-left: 0px !important;
-}
+
 .p-l-5 {
   padding-left: 5px !important;
 }
-.p-l-6 {
-  padding-left: 6px !important;
-}
 .p-l-10 {
   padding-left: 10px !important;
-}
-.p-l-13 {
-  padding-left: 13px !important;
 }
 .p-l-15 {
   padding-left: 15px !important;
@@ -275,20 +234,9 @@ a {
 .p-l-30 {
   padding-left: 30px !important;
 }
-.p-l-40 {
-  padding-left: 40px !important;
-}
-.p-l-50 {
-  padding-left: 50px !important;
-}
-.p-r-0 {
-  padding-right: 0px !important;
-}
+
 .p-r-5 {
   padding-right: 5px !important;
-}
-.p-r-6 {
-  padding-right: 6px !important;
 }
 .p-r-10 {
   padding-right: 10px !important;
@@ -302,23 +250,9 @@ a {
 .p-r-30 {
   padding-right: 30px !important;
 }
-.p-r-40 {
-  padding-right: 40px !important;
-}
-.p-r-50 {
-  padding-right: 50px !important;
-}
-.p-b-0 {
-  padding-bottom: 0px !important;
-}
-.p-b-3 {
-  padding-bottom: 3px !important;
-}
+
 .p-b-5 {
   padding-bottom: 5px !important;
-}
-.p-b-6 {
-  padding-bottom: 6px !important;
 }
 .p-b-10 {
   padding-bottom: 10px !important;
@@ -332,107 +266,114 @@ a {
 .p-b-30 {
   padding-bottom: 30px !important;
 }
-.p-b-40 {
-  padding-bottom: 40px !important;
-}
-.p-b-50 {
-  padding-bottom: 50px !important;
-}
 
-.bor-gray {
-  border: 1px solid #e5e5e5;
-}
-.bor-gra {
-  border: 1px solid #C0CCDA;
-}
-.bor-b-gray {
-  border-bottom: 1px solid #e5e5e5;
-}
-.bor-b-ccc {
-  border-bottom: 1px solid #ccc;
-}
-.bor-none {
+.bd-none {
   border: none;
 }
 
 
-.bor-ra-3 {
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -o-border-radius: 3px;
-  -ms-border-radius: 3px;
+.bd-r-3 {
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
 }
-.bor-ra-5 {
-  border-radius: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -o-border-radius: 5px;
-  -ms-border-radius: 5px;
-}
-
-
-.tx-c {
-  text-align: center;
+.bd-r-5 {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
 }
 
-.bg-wh {
-  background: #fff;
+.text-center {
+    text-align: center;
 }
-.bg-gray {
-  background: #e5e5e5;
+
+.bg-aqua{
+    background-color: $primary-color;
+  }
+.bg-red{
+    background-color: $danger-color;
 }
-.bg-gra {
-  background: #F9F9F9;
+.bg-green{
+    background-color: $success-color;
 }
+.bg-yellow{
+    background-color: $warn-color;
+  }
+.bg-Cornsilk {
+    background-color: Cornsilk;
+}
+
+.bg-DarkViolet{
+    background-color: DarkViolet;
+}
+
+.bg-DarkRed{
+    background-color: DarkRed;
+}
+
+.bg-DimGray{
+    background-color: DimGray;
+}
+
+.bg-Indigo{
+background-color: Indigo;
+}
+
+.bg-SaddleBrown{
+background-color: SaddleBrown;
+} 
+
+.bg-SeaGreen{
+    background-color: SeaGreen;
+} 
+
+.bg-SteelBlue{
+    background-color: SteelBlue;
+} 
+
 .bg-transparency {
-  background: rgba(0,0,0,0);
-}
-.bg-blue {
-  background: #20a0ff !important;
+    background: rgba(0,0,0,0);
 }
 
 .c-gray {
-  color: #ccc!important;;
-}
-.c-light-gray {
-  color: #99a9bf!important;;
-}
-.c-gra {
-  color: #C0CCDA!important;;
-}
-.c-deep-blue {
-  color: #1F2D3D!important;;
+    color: $gray-color!important;;
 }
 .c-blue {
-  color: #337ab7!important;;
-}
-.c-black {
-  color: #333!important;;
+  color: $primary-color!important;;
 }
 .c-red {
-    color: red!important;
+    color: $danger-color!important;
 }
 .c-green {
-    color: green!important;;
+    color: $success-color!important;
 }
-.fz-12 {
-  font-size: 12px
+.c-white{
+    color: $white-color!important;
 }
-.fz-14 {
-  font-size: 14px
+.c-black{
+    color: $black-color!important;
 }
+
 .fz-18 {
-  font-size: 18px
+    font-size: 18px
 }
-.fz-20 {
-  font-size: 20px
-}
+
 .fz-22 {
   font-size: 22px
 }
 .fz-24 {
   font-size: 24px
+}
+
+.fw-500{
+    font-weight: 500;
+}
+.fw-800{
+    font-weight: 800;
 }
 
 .pointer {
@@ -446,4 +387,18 @@ a {
     clear:both;
     visibility:hidden;
     height:0
+}
+
+.panel-header{
+    color:#333;
+    background-color: #f5f5f5;
+    padding:15px 15px;    
+}
+
+.header-line{
+    font-weight:500;
+    font-size: 1.3rem;
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 1.5rem;
+    margin-bottom:1rem
 }
