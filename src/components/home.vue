@@ -68,16 +68,17 @@
             <el-menu 
             :default-active="activeItem" 
             background-color="#222d32"
-            text-color="#fff"
-            active-text-color="#3c8dbc"
-            class="el-menu-vertical-demo"  
+            text-color="#ddd"
+            active-text-color="#ffbf00"
+            class="el-menu-vertical"  
+            unique-opened=true
             :collapse="isCollapse">
-                <el-submenu index="device" >
+                <el-submenu index="device">
                     <template slot="title">
                         <i class="fa fa-tasks" aria-hidden="true"></i>
                         <span slot="title">Device management</span>
                     </template>
-                    <el-menu-item-group>
+                    <el-menu-item-group >
                         <router-link to="/main/device/list">
                             <el-menu-item index="device-devicelist">
                                     Device List
@@ -90,7 +91,7 @@
                         </router-link>
                     </el-menu-item-group>
                 </el-submenu>
-                 <el-submenu index="control" >
+                <el-submenu index="control" >
                     <template slot="title">
                         <i class="fa fa-hand-pointer-o" aria-hidden="true"></i>
                         <span slot="title">Device Control</span>
@@ -149,6 +150,7 @@
     $nav-icon-color : $primary-color; 
     $header-height : 70px;
     $aside-width : 220px;
+
     .wrapper{
         display: -webkit-flex;
         display:flex;
@@ -167,6 +169,9 @@
                 margin:0;
                 display: flex;
                 li{ 
+                    img{
+                        height: 17px;
+                    }
                     i{
                         color : $nav-icon-color;
                         font-size:1.5rem
@@ -201,12 +206,20 @@
             flex-flow: row nowrap;
         }
 
-        .el-menu-vertical-demo:not(.el-menu--collapse) {
+        .el-menu-vertical:not(.el-menu--collapse) {
             flex: 0 0 $aside-width;
-            // background-color:$black-color;
             height: 100%;
             box-sizing: border-box;
+            i {
+                margin-right: 5px;
+            }
 
+            .el-menu-item-group, .el-menu-item-group li{
+                background-color: #181f23 !important;
+            }
+            .is-active{
+                background-color: rgb(27,36,40) !important;
+            }
         }
 
         .content{

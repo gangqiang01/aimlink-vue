@@ -4,9 +4,14 @@
             <p class="header-line"><i class="fa fa-object-group c-blue m-r-10" aria-hidden="true"></i> Device Group </p>
         </div>
         <div class="m-t-20">
-            <p class="panel-header">
+            <div class="panel-header">
                 All Device Group
-            </p>
+                <!-- <div class="fr m-r-10"> 
+                    <el-input size="small" class="w-300 m-l-10 m-b-5" v-model="groupKeyword" placeholder="Please input keyword of device">
+                        <el-button slot="append" icon="el-icon-search"  @click="getDeviceGroup" ></el-button>
+                    </el-input>
+                </div> -->
+            </div>
             
             <el-table
                 :data="deviceGroupList"
@@ -27,14 +32,14 @@
                 </template>
                 </el-table-column>
                 <el-table-column
-                label="Device ID"
-                prop="gid"
+                label="Group Name"
+                prop="name"
                 min-width="120"
                 sortable>
                 </el-table-column>
                 <el-table-column
-                label="Group Name"
-                prop="name"
+                label="Group ID"
+                prop="gid"
                 min-width="120"
                 sortable>
                 </el-table-column>
@@ -117,6 +122,7 @@
                     groupName:'',
                     groupDescription:''
                 },
+                groupKeyword: '',
 
                 rules:{
                     groupName: [
@@ -134,7 +140,7 @@
                 devGetData.pageSize = 1000;
                 devGetData.no = 1;
                 devGetData.orderType = "aid";
-                devGetData.like = "";
+                devGetData.like = this.groupKeyword;
                 devGetData._ = new Date().getTime();
                 this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
                     this.handleResponse(data, (res) => {

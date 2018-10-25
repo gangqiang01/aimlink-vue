@@ -1,64 +1,76 @@
 <template>
     <div>
-        <p class="header-line"><i class="fa fa-plus-square-o c-blue m-r-10"></i> Add Device</h3>
-        <p class="panel-header">All Unassigned Devices</p>
-        <el-table
-            :data="deviceList"
-            tooltip-effect="dark"
-            style="width: 100%"
-            @selection-change="handleSelectionChange">
-
-            <el-table-column
-            type="selection"
-            min-width="55">
-            </el-table-column>
-
-            <el-table-column
-            prop="name"
-            label="Device Name"
-            min-width="120">
-            </el-table-column>
-
-            <el-table-column
-            prop="agentId"
-            label="Agent ID"
-            min-width="120">
-            </el-table-column>
-        </el-table>
-        <div class="m-t-10 cf">
-            <el-pagination class="fr"
-            @current-change="handleCurrentChange"
-            layout="prev, pager, next"
-            :page-size="limit"
-            :current-page="currentPage"
-            :total="dataCount"
-            v-show="isshow"
-            background
-            >
-            </el-pagination>
-            
+        <div class="m-t-10 ">
+            <p class="header-line">
+                <i class="fa fa-plus-square-o c-blue m-r-10"></i> Add Device
+            </p>
         </div>
-        <div  class="m-t-10 cf">
-            <el-button v-loading="addLoading" size="small" @click="dialogFormVisible = true" type="primary" class="m-t-10 fr">Add</el-button>
-            <el-dialog title="Select device group you want to add" :visible.sync="dialogFormVisible">
-                <el-form :model="form">
-                    <span class="m-r-10">Device Group:</span>
-                    <el-select v-model="form.selectGroup">
-                        <el-option
-                        v-for="item in groupOptions"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form>
-                <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="addDevice">确 定</el-button>
+        <div class="m-t-20">
+            <div class="panel-header">
+                All Unassigned Devices
+                <div class="fr m-r-10"> 
+                    <el-input size="small" class="w-300 m-l-10" v-model="deviceKeyword" placeholder="Keyword of device name">
+                        <el-button slot="append" icon="el-icon-search"  @click="getUnassignedDevices" ></el-button>
+                    </el-input>
                 </div>
-            </el-dialog>
+            </div>
+
+            <el-table
+                :data="deviceList"
+                tooltip-effect="dark"
+                style="width: 100%"
+                @selection-change="handleSelectionChange">
+
+                <el-table-column
+                type="selection"
+                min-width="55">
+                </el-table-column>
+
+                <el-table-column
+                prop="name"
+                label="Device Name"
+                min-width="120">
+                </el-table-column>
+
+                <el-table-column
+                prop="agentId"
+                label="Agent ID"
+                min-width="120">
+                </el-table-column>
+            </el-table>
+            <div class="m-t-10 cf">
+                <el-pagination class="fr"
+                @current-change="handleCurrentChange"
+                layout="prev, pager, next"
+                :page-size="limit"
+                :current-page="currentPage"
+                :total="dataCount"
+                v-show="isshow"
+                background
+                >
+                </el-pagination> 
+            </div>
+            <div  class="m-t-10 cf">
+                <el-button v-loading="addLoading" size="small" @click="dialogFormVisible = true" type="primary" class="m-t-10 fr">Add</el-button>
+                <el-dialog title="Select device group you want to add" :visible.sync="dialogFormVisible">
+                    <el-form :model="form">
+                        <span class="m-r-10">Device Group:</span>
+                        <el-select v-model="form.selectGroup">
+                            <el-option
+                            v-for="item in groupOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogFormVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="addDevice">确 定</el-button>
+                    </div>
+                </el-dialog>
+            </div>
         </div>
-        
     </div>
 </template>
 
@@ -80,7 +92,8 @@
                 isshow: false,
                 form:{
                     selectGroup: ''
-                }
+                },
+                deviceKeyword: ''
             }
         },
         methods:{
@@ -89,7 +102,7 @@
                 devgetdata.pageSize = 1000;
                 devgetdata.no = 1;
                 devgetdata.orderType = "did";
-                devgetdata.like = '';
+                devgetdata.like = this.deviceKeyword;
                 devgetdata._ = new Date().getTime();
                 _g.openGlobalLoading();
                 this.apiGet('rmm/v1/devices/unassigned', devgetdata).then((data) => {

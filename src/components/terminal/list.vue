@@ -1,6 +1,6 @@
 <template>
    <div>
-        <p class="header-line"><i class="fa fa-hand-lizard-o c-blue m-r-10" ></i>Remote Control</p>
+        <p class="header-line"><i class="fa fa-terminal c-blue m-r-10" ></i>Device Terminal</p>
         <el-col :span="6">
             <select-group @select-device="getDeviceOption"></select-group>
         </el-col>

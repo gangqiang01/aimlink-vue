@@ -14,6 +14,12 @@
                     :value="item.value">
                     </el-option>
                 </el-select>
+                
+                <div class="fr m-r-10"> 
+                    <el-input size="small" class="w-300 m-l-10" v-model="deviceKeyword" placeholder="Keyword of device name">
+                        <el-button slot="append" icon="el-icon-search"  @click=" getAllDevices" ></el-button>
+                    </el-input>
+                </div>
             </div>
             
             <el-table
@@ -107,7 +113,8 @@
                 currentPage: 1,
                 isshow: false,
                 addLoading: false,
-                deleteLoading: false
+                deleteLoading: false,
+                deviceKeyword: ''
             }
         },
 
@@ -151,8 +158,8 @@
                 let devicegetdata = {};
                 devicegetdata.pageSize = 10000;
                 devicegetdata.no = 1;
-                devicegetdata.orderType = "did";
-                devicegetdata.like = "";
+                devicegetdata.orderType = "did"; 
+                devicegetdata.like = this.deviceKeyword;
                 devicegetdata._ = new Date().getTime();
                 this.apiGet("rmm/v1/devicegroups/"+groupid+"/devices", devicegetdata).then((data) => {
                     this.handleResponse(data, (res) => {

@@ -1,12 +1,12 @@
 <template>
     <div>
-        <p class="header-line"><i class="fa fa-line-chart c-blue m-r-10" ></i>Device Monitor</p>
+        <p class="header-line"><i class="fa fa-android c-blue m-r-10" ></i>App Control</p>
         <el-col :span="6">
             <select-group @select-device="getDeviceOption"></select-group>
         </el-col>
         <el-col :span="18" class="m-t-20">
              <el-tabs v-model="activeName" @tab-click="handleClick">
-                <el-tab-pane label="App Control" name="appcontrol">
+                <el-tab-pane label="App Action" name="appaction">
                     <el-form ref="form" :model="form" label-width="150px" class="m-t-20 m-l-30">
                          <el-form-item label="Launch App:" >
                             <el-select v-model="form.launchapp" placeholder="Please select app" class="w-300" size="small">
@@ -104,7 +104,7 @@
     export default{
         data(){
             return {
-                activeName: "appcontrol",
+                activeName: "appaction",
                 form: {
 
                 },
