@@ -1,5 +1,4 @@
-const apiMethods = {
-    methods: {
+const baseApi = {
         apiGet(url, object) {
             let geturl
             if(object != undefined){
@@ -127,6 +126,5 @@ const apiMethods = {
                     console.log(res)
             }
         },
-    }
 }
-export default apiMethods
+export default baseApi

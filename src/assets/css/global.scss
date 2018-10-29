@@ -342,13 +342,13 @@ background-color: SaddleBrown;
 .c-gray {
     color: $gray-color!important;;
 }
-.c-blue {
+.c-primaty {
   color: $primary-color!important;;
 }
-.c-red {
+.c-danger {
     color: $danger-color!important;
 }
-.c-green {
+.c-success {
     color: $success-color!important;
 }
 .c-white{
@@ -356,6 +356,9 @@ background-color: SaddleBrown;
 }
 .c-black{
     color: $black-color!important;
+}
+.c-warn{
+    color: $warn-color;
 }
 
 .fz-18 {

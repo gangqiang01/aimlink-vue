@@ -6,7 +6,7 @@
         <div class="m-t-20">
             <div class="panel-header">
                 Device Group:
-                <el-select v-model="selectValue" size="small">
+                <el-select v-model="selectValue" size="small" @change="groupChange">
                     <el-option
                     v-for="item in groupOptions"
                     :key="item.value"
@@ -60,7 +60,7 @@
                         <span v-else>offline</span>
                     </template>
                 </el-table-column>
-                 <el-table-column
+                <el-table-column
                 label="Action"
                 min-width="120">
                     <template slot-scope="scope">
@@ -96,7 +96,10 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
+    import deviceApi from '../restfulapi/deviceapi'
+    import deviceGroupApi from '../restfulapi/devicegroupapi'
+    import handleResponse from '../restfulapi/handleresponse'
+
     export default{
         data(){
             return{
@@ -106,7 +109,7 @@
                 deviceList:[],
                 isconnect: false,
                 online: "fa fa-child c-green",
-                offline: 'fa fa-minus-circle c-red',
+                offline: 'fa fa-minus-circle c-danger',
                 multipleTable:[],
                 limit: 10,
                 dataCount: null,
@@ -121,48 +124,30 @@
 
         methods:{
             getDeviceGroup(){
-                
-                let devGetData = {};
-                devGetData.pageSize = 1000;
-                devGetData.no = 1;
-                devGetData.orderType = "aid";
-                devGetData.like = "";
-                devGetData._ = new Date().getTime();
-                this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
+                this.getDeviceGroupApi(this).then((data) => {
                     this.handleResponse(data, (res) => {
-                        let accountId = res.accounts[0].aid
-                        let groupGetData = {};
-                        groupGetData._ = new Date().getTime();
-                        this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
-                            this.handleResponse(data, (res) => {
-                                let groupData = res.accounts[0].groups
-                                console.log(groupData)
-                                if(groupData.length != 0){
-                                    let groupOptionsData = [];
-                                   groupData.forEach(function(val){
-                                       groupOptionsData.push({value: val.gid, label:val.name})
-                                   }) 
-                                   this.selectValue = groupData[0].gid;
-                                   this.groupOptions = groupOptionsData
-                                   this.getAllDevices();
-                                }
-                            })
-                        })
+                        let groupData = res.accounts[0].groups
+                        console.log(groupData)
+                        if(groupData.length != 0){
+                            let groupOptionsData = [];
+                            groupData.forEach(function(val){
+                                groupOptionsData.push({value: val.gid, label:val.name})
+                            }) 
+                            this.selectValue = groupData[0].gid;
+                            this.groupOptions = groupOptionsData
+                            this.getAllDevices();
+                        }else{
+                            this.groupOptions = [];
+                            this.getAllDevices();
+                        }
                     })
-                    
                 })
             },
 
             getAllDevices(){
                 let groupid = this.selectValue;
-                let devicegetdata = {};
-                devicegetdata.pageSize = 10000;
-                devicegetdata.no = 1;
-                devicegetdata.orderType = "did"; 
-                devicegetdata.like = this.deviceKeyword;
-                devicegetdata._ = new Date().getTime();
-                this.apiGet("rmm/v1/devicegroups/"+groupid+"/devices", devicegetdata).then((data) => {
-                    this.handleResponse(data, (res) => {
+                this.getDeviceApi(groupid).then((data) => {
+                    this.handleResponse(data, (res) => { 
                         this.deviceTableData = res.groups[0].devices;
                         this.dataCount = this.deviceTableData.length;
                         this.deviceList = this.deviceTableData.slice(0,this.limit)
@@ -171,7 +156,9 @@
                     })
                 })
             },
-
+            groupChange(){
+                this.getAllDevices();
+            },
             confirmDelete(row){ 
                 console.log("rowdata:",row);
                 let dddata = {};
@@ -185,10 +172,10 @@
                     dangerMode:true,
                 }).then((willDelete) => {
                     if(willDelete){
-                        this.apiPut('rmm/v1/devices', dddata).then((data) => {
-                            this.handleResponse(data, (res) => {
+                        this.DeleteDeviceApi(row).then((data) => {
+                            this.handleResponse(data, (res)=>{
                                 if(res.result){
-                                    swal("","Delete device successfully",'success').then(function(){
+                                    swal("", "Delete successfully", "success").then(() => {
                                         this.getAllDevices();
                                     })
                                 }
@@ -225,13 +212,7 @@
                 }).then((willDelete) => {
                     this.deleteLoading = !this.deleteLoading;
                     if(willDelete){
-                        let dddata = {};
-                        dddata.devices = [];
-
-                        this.multipleTable.forEach((value, i) => {
-                            dddata.devices[i] = {"did": value.did, "groupIds":[]};   
-                        })
-                        this.apiPut("rmm/v1/devices",  dddata).then((data) => {
+                        this.DeleteDeviceApi(multipleTable).then((data) => {
                             this.handleResponse(data, (res)=>{
                                 if(res.result){
                                     swal("", "Delete successfully", "success").then(() => {
@@ -239,7 +220,6 @@
                                     })
                                 }
                             })
-                            
                         })
                      }
                     
@@ -256,18 +236,12 @@
         created(){
             this.getDeviceGroup();
         },
-        mixins:[http]
+        mixins:[deviceApi, deviceGroupApi, handleResponse]
     }
 </script>
 <style lang='scss' scoped>
-.btn-group{
-    color:#428bca;
-}
-.text {
-font-size: 14px;
-}
-
-.item {
-margin-bottom: 18px;
-}
+@import "@/assets/css/colors.scss";
+    .el-table thead{
+        backgroud-color: $primary-color !important;
+    }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="m-t-10 ">
-            <p class="header-line"><i class="fa fa-object-group c-blue m-r-10" aria-hidden="true"></i> Device Group </p>
+            <p class="header-line"><i class="fa fa-object-group c-primary m-r-10" aria-hidden="true"></i> Device Group </p>
         </div>
         <div class="m-t-20">
             <div class="panel-header">
@@ -102,8 +102,9 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
-    import btnGroup from '@/common/btn-group'
+
+    import deviceGroupApi from '../restfulapi/devicegroupapi'
+    import handleResponse from '../restfulapi/handleresponse'
     export default{
         data(){
             return{
@@ -136,30 +137,16 @@
 
         methods:{
             getDeviceGroup(){
-                let devGetData = {};
-                devGetData.pageSize = 1000;
-                devGetData.no = 1;
-                devGetData.orderType = "aid";
-                devGetData.like = this.groupKeyword;
-                devGetData._ = new Date().getTime();
-                this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
+                this.getDeviceGroupApi(this).then((data) => {
                     this.handleResponse(data, (res) => {
-                        let accountId = res.accounts[0].aid
-                        let groupGetData = {};
-                        groupGetData._ = new Date().getTime();
-                        this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
-                            this.handleResponse(data, (res) => {
-                                console.log("grouplist",res);
-                                this.groupTableData = res.accounts[0].groups;
-                                this.form.account = res.accounts[0].fullName;
-                                this.aid = res.accounts[0].aid;
-                                this.dataCount = this.groupTableData.length;
-                                this.deviceGroupList = this.groupTableData.slice(0,this.limit)
-                                this.isshow = this.dataCount > this.limit;
-                            })
-                        })
+                        console.log("grouplist",res);
+                        this.groupTableData = res.accounts[0].groups;
+                        this.form.account = res.accounts[0].fullName;
+                        this.aid = res.accounts[0].aid;
+                        this.dataCount = this.groupTableData.length;
+                        this.deviceGroupList = this.groupTableData.slice(0,this.limit)
+                        this.isshow = this.dataCount > this.limit;
                     })
-                    
                 })
             },
 
@@ -172,7 +159,7 @@
                     dangerMode:true,
                 }).then((willDelete) => {
                     if(willDelete){
-                        this.apiDelete('rmm/v1/devicegroups/'+row.gid).then((data) => {
+                        this.deleteGroupApi(row).then((data) => {
                             this.handleResponse(data, (res) => {
                                 if(res.result){
                                     swal("","Delete group successfully",'success').then(() => {
@@ -198,11 +185,7 @@
 
             addGroup(){
                 this.dialogFormVisible = false;
-                let addGroupData = {};        
-                addGroupData.deviceGroups = [{aid: this.aid, gid: '', name: this.form.groupName, description: this.form.groupDescription}];
-                this.deleteLoading = !this.deleteLoading;
-                this.apiPost("rmm/v1/devicegroups", addGroupData).then((data) =>{
-                    this.deleteLoading = !this.deleteLoading;
+                this.addGroupApi(this.aid, '', this.form.groupName, this.form.groupDescription).then((data) => {
                     this.handleResponse(data, (res) =>{
                         if(res.result){
                             swal("", "Add group successfully", "success").then((val) =>{
@@ -221,7 +204,7 @@
             this.getDeviceGroup();
         },
 
-        mixins:[http]
+         mixins:[deviceGroupApi, handleResponse]
     }
 </script>
 <style lang='scss' scoped>

@@ -9,14 +9,23 @@ import devicegroupList from '@/components/devicegroup/list';
 import refresh from '@/components/refresh'
 import vncList from '@/components/vnc/list';
 import terminalList from '@/components/terminal/list';
+import messageList from '@/components/message/list';
 import main from '@/components/home'
 import auth from '@/assets/js/auth'
 let childRoute = [
     {
-        path: '/refresh',
+        path: 'refresh',
         component: refresh,
         name: "refresh",
         meta:{}
+    },
+    {
+        path: 'message/list',
+        component: messageList,
+        name: 'messageList',
+        meta:{
+            menuNmae: 'messageList'
+        }
     },
     {
         path: 'batch/list',
@@ -115,6 +124,8 @@ let route = [
                     })
                 }
    
+            }).catch((err) =>{
+                console.log(err);
             });
             
         },
@@ -129,10 +140,7 @@ let route = [
 ]
 
 function redirectByAuth(){
-    console.log('route',auth.loginstatus());
     return auth.loginstatus().then(function(data){
-        console.log(data);
-        
         if(data){
             return '/main';
         }else{

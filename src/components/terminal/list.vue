@@ -26,6 +26,7 @@
     import http from '@/assets/js/http'
     import selectGroup from '../../common/select-group'
     import _terminalWebsocket from "@/thirdpackage/shellinabox/terminalSocket"
+    import uuid from '@/thirdpackage/shellinabox/uuid-random'
 
     export default{
         data(){

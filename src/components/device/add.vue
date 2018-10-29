@@ -2,7 +2,7 @@
     <div>
         <div class="m-t-10 ">
             <p class="header-line">
-                <i class="fa fa-plus-square-o c-blue m-r-10"></i> Add Device
+                <i class="fa fa-plus-square-o c-primary m-r-10"></i> Add Device
             </p>
         </div>
         <div class="m-t-20">
@@ -75,7 +75,9 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
+    import deviceApi from '../restfulapi/deviceapi'
+    import deviceGroupApi from '../restfulapi/devicegroupapi'
+    import handleResponse from '../restfulapi/handleresponse'
 
     export default{
         data(){
@@ -97,15 +99,10 @@
             }
         },
         methods:{
+            
             getUnassignedDevices(){
-                let devgetdata = {};
-                devgetdata.pageSize = 1000;
-                devgetdata.no = 1;
-                devgetdata.orderType = "did";
-                devgetdata.like = this.deviceKeyword;
-                devgetdata._ = new Date().getTime();
                 _g.openGlobalLoading();
-                this.apiGet('rmm/v1/devices/unassigned', devgetdata).then((data) => {
+                this.getUnassignedDevicesApi(this.deviceKeyword).then((data) => {
                     this.handleResponse(data, (res) =>{
                         this.deviceData = res.devices
                         this.dataCount = res.devices.length;
@@ -117,7 +114,6 @@
                         }
                     })
                 })
-
             },
 
             handleSelectionChange(val){
@@ -125,62 +121,40 @@
             },
 
             getDeviceGroup(){
-                
-                let devGetData = {};
-                devGetData.pageSize = 1000;
-                devGetData.no = 1;
-                devGetData.orderType = "aid";
-                devGetData.like = "";
-                devGetData._ = new Date().getTime();
-                this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
+                this.getDeviceGroupApi(this).then((data) => {
                     this.handleResponse(data, (res) => {
-                        let accountId = res.accounts[0].aid
-                        let groupGetData = {};
-                        groupGetData._ = new Date().getTime();
-                        this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
-                            this.handleResponse(data, (res) => {
-                                let groupData = res.accounts[0].groups
-                                console.log(groupData)
-                                if(groupData.length != 0){
-                                    let groupOptionsData = [];
-                                   groupData.forEach(function(val){
-                                       groupOptionsData.push({value: val.gid, label:val.name})
-                                   }) 
-                                   this.selectValue = groupData[0].gid;
-                                   this.groupOptions = groupOptionsData
-                                }
-                            })
-                        })
+                        let groupData = res.accounts[0].groups
+                        console.log(groupData)
+                        if(groupData.length != 0){
+                            let groupOptionsData = [];
+                            groupData.forEach(function(val){
+                                groupOptionsData.push({value: val.gid, label:val.name})
+                            }) 
+                            this.selectValue = groupData[0].gid;
+                            this.groupOptions = groupOptionsData
+                        }else{
+                            this.groupOptions = [];
+                        }
                     })
-                    
+                      
                 })
             },
 
             addDevice(){
                 this.dialogFormVisible = false;
-                let adddata = {};
-                adddata.devices = [];
-                let groupid = this.form.selectGroup;
-                if(this.multipleTable.length ==0){
-                    swal("","Please select Device",'info')
+                if(this.multipleTable.length == 0){
+                    swal('', 'Please select device', 'warning');
                     return;
                 }
-                
-                this.multipleTable.forEach((val, i) => {
-                    adddata.devices[i] = {};
-                    adddata.devices[i].did = val.did;
-                    adddata.devices[i].groupIds = [];
-                    adddata.devices[i].groupIds[0] = groupid+"";
-                    this.apiPut("rmm/v1/devices", adddata).then((data) => {
-                        this.handleResponse(data, (res) => {
-                            if(res.result){
-                                swal("","Add device successfully", 'success').then((val)=>{
-                                    if(val){
-                                        router.replace({name: "deviceList"})
-                                    }
-                                })
-                            }
-                        })
+                this.addDeviceApi(this.multipleTable, this.form.selectGroup).then((data) => {
+                    this.handleResponse(data, (res) => {
+                        if(res.result){
+                            swal("","Add device successfully", 'success').then((val)=>{
+                                if(val){
+                                    router.replace({name: "deviceList"})
+                                }
+                            })
+                        }
                     })
                 })
             },
@@ -195,6 +169,6 @@
             this.getDeviceGroup();
         },
 
-        mixins:[http]
+         mixins:[deviceApi, deviceGroupApi, handleResponse]
     }
 </script>

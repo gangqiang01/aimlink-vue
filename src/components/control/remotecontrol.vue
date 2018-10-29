@@ -159,7 +159,7 @@
                 GetSensorsData._ = Date.parse(new Date());
                 let myurl = "rmm/v1/devicectrl/"+deviceid+"/data";
                 this.apiGet(myurl, GetSensorsData).then((obj) => {
-                    handleResponse(obj, (res) => {
+                    this.handleResponse(obj, (res) => {
                         let sensorarray = res.sensorIds;
                         sensorarray.forEach(function(val){
                             let sensorid = val.sensorId;
@@ -172,11 +172,6 @@
 
                                 
                                 }
-                            }
-                            if(sensorid == controlProperty.aimSdkPlugin+AppFuncSensor.allappinfo){
-                                let apppackageinfo = JSON.parse(val.sv);
-                                setAppControlList(apppackageinfo.data, AppManagementInfoArray, deviceapparray);
-                                getRepoApps(AppManagementInfoArray, deviceapparray);
                             }
                             
                         })  
@@ -224,7 +219,7 @@
                 setsensordata.sensorIds = [];
                 setsensordata.sensorIds[0]={"n":setsensorid, "bv":setsensorval};
                 this.apiPost("rmm/v1/devicectrl/data",setsensordata).then((data) => {
-                    handleResponse(data, (res) =>{
+                    this.handleResponse(data, (res) =>{
                         if(res.items[0].statusCode == "200"){
                             swal("","success","success");
                         }else{
@@ -251,10 +246,13 @@
                         let powdata = {};
                         powdata.action = cid;
                         powdata.did = this.selectedDeviceId;
-                        apiput("rmm/v1/power/device", powdata).then(function(data){
-                            if(data.result == true){
-                                swal("", cid+" success", "success")
-                            }
+                        this.apiPut("rmm/v1/power/device", powdata).then((data) => {
+                            this.handleResponse(data, (res) => {
+                                if(data.result == true){
+                                    swal("", cid+" success", "success")
+                                }
+                            })
+                           
                         })
                     }
                 })  

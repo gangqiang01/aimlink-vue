@@ -13,16 +13,54 @@
             <ul class="nav-right">
                 <li>
                     <el-dropdown trigger="click" >
-                        <el-badge :value=msgcount class="el-dropdown-link">
+                        <el-badge :value="msgCount" class="el-dropdown-link" >
                             <i class="fa fa-bell-o fa-x header-bell" aria-hidden="true"></i>
                         </el-badge> 
-                        <el-dropdown-menu slot="dropdown" v-if="isshow">
-                            <el-dropdown-item>
-                                <ul>
-                                    <li v-for="item in msgData">
-
-                                    </li>
-                                </ul>
+                        <el-dropdown-menu slot="dropdown" >
+                             <el-dropdown-item v-show='!msgIsShow' class="text-center fz-18 c-primary">
+                                <span>
+                                    <i class="fa fa-bell-slash-o m-r-10" aria-hidden="true"></i>No new notifications
+                                </span>
+                            </el-dropdown-item>
+                            <el-dropdown-item v-show='msgIsShow' class="text-center fz-18">
+                                you have {{msgCount}} new notifications
+                            </el-dropdown-item>
+                            <el-dropdown-item v-for="(item, index) in msgData" :key="index">
+                                <el-tooltip placement="top">
+                                    <div slot="content">
+                                        <ul>
+                                            <li>
+                                                <span>device: </span>{{item.agent_name}}
+                                            </li>
+                                            <li>
+                                                <span>type:</span>{{item.type}}
+                                            </li>
+                                            <li>
+                                                <span>Date:</span>{{item.ts.$date|time}}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="m-l-5" v-if="item.severity == 'ERROR'">
+                                        <i class="fa fa-times-circle fa-x c-danger p-r-5"></i>
+                                        {{item.subtype.toLowerCase()}}
+                                    </div>
+                                     <div class="m-l-5" v-if="item.severity == 'WARNING'">
+                                        <i class="fa fa-exclamation-triangle fa-x c-warn p-r-5"></i>
+                                        {{item.subtype.toLowerCase()}}
+                                    </div>
+                                     <div class="m-l-5" v-else>
+                                        <i class="fa fa-info-circle fa-x c-success p-r-5" ></i>
+                                        {{item.subtype.toLowerCase()}}
+                                    </div>
+                                </el-tooltip>   
+                            </el-dropdown-item>
+                            <el-dropdown-item v-show="msgIsShow">
+                                <el-button type="primary" size="small" class="fl" @click="viewAll">
+                                    <i class="fa fa-eye m-r-5"></i>View all event
+                                </el-button>
+                                <el-button type="primary" size="small" class="fr" @click="markAll">
+                                    <i class="fa fa-eye-slash m-r-5"></i>Mark All as read
+                                </el-button>
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -34,27 +72,20 @@
                             <i class="fa fa-user-circle-o header-user"></i> 
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item >
-                                <ul class="home_userinfo">
-                                    <li class="drapdown-user">
-                                        
-                                        <img src="@/assets/imgs/face_black.png" alt="">
-                                        <p> {{useremail}}</p>
-                                    </li>
-                                    <li>
-                                        <p>
-                                            <b>Last Accessed:</b>{{logintime}}
-                                        </p>
-                                        <p>
-                                            <b>Device Bound:</b>{{devicecount}}
-                                        </p>
-                                    </li>
-                                    <li class="drapdown-loginaction">
-                                        <el-button type="primary" size="small" class="fr" @click="loginout()">
-                                            {{loginstate}}
-                                        </el-button>
-                                    </li>
-                                </ul>
+                            <el-dropdown-item class="text-center" >
+                                <img src="@/assets/imgs/face_black.png" alt="">
+                                <p> {{useremail}}</p>
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <b>Last Accessed:</b>{{logintime}}
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <b>Device Bound:</b>{{devicecount}}
+                            </el-dropdown-item>
+                            <el-dropdown-item>
+                                <el-button type="primary" size="small" class="fr" @click="loginout()">
+                                    {{loginstate}}
+                                </el-button>
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>  
@@ -136,7 +167,9 @@
 
             <main class="content">
                 <transition name="fade" mode="out-in">
-                    <router-view v-loading="showLoading"></router-view>
+                    <keep-alive>
+                        <router-view v-loading="showLoading"></router-view>
+                    </keep-alive>
                 </transition>
             </main>
         </div>   
@@ -263,16 +296,16 @@
             return {
                 isCollapse: false,
                 img:"",
-                msgcount:'',
+                msgCount:'',
                 loginstate:'Login Out',
                 useremail:'',
                 logintime:'',
                 devicecount:'',
-                msgData: '',
-                isshow: false,
+                msgData: [],
+                msgIsShow: false,
                 allowleft: "fa fa-long-arrow-left",
                 allowright: "fa fa-bars",
-                activeItem: 'device-devicelist'
+                activeItem: 'device-devicelist',
             };
         },
         methods: {
@@ -303,27 +336,63 @@
                 this.$router.replace('/');
             },
             websocket(){
-                var ws = websockconnect();
-                ws.onopen = function(evt) { 
+                let that = this
+                let ws = websockconnect();
+                ws.onopen = (evt) => { 
                     console.log("Connection open ..."); 
                 };
-                ws.onmessage = function(eventJson) {
+                ws.onmessage = (eventJson) => {
                     console.log("msgenter");
-                    var msgData = JSON.parse(eventJson.data);
-                    this.msgData = msgData;
+                    let msgOrgData = JSON.parse(eventJson.data).events;
+                    if(msgOrgData.length != 0){
+                        msgOrgData = msgOrgData.map((val)=> {
+                            return JSON.parse(val);
+                        });
+                        that.msgData = that.msgData.concat(msgOrgData);
+                        window.localStorage.setItem("msgData", JSON.stringify(that.msgData));
+                        that.msgCount = that.msgData.length;
+                        that.msgIsShow = true;
+                    }
                 };
-                ws.onclose = function(evt) {
+                ws.onclose = (evt) => {
                     console.log("Connection closed.");
                     ws = null;
                 };
+            },
+
+            markAll(){
+                this.msgCount = '';
+                this.msgData = [];
+                this.msgIsShow = false;
+                window.localStorage.removeItem("msgData");   
+            },
+
+            viewAll(){
+                this.markAll();
+                router.replace('/main/message/list')
+            },
+
+            showMsg(){
+                if(window.localStorage.getItem("msgData") != null){
+                    
+                    let msgLocalData = localStorage.getItem('msgData');
+                    msgLocalData = JSON.parse(msgLocalData);
+                    this.msgData = msgLocalData;
+                    this.msgCount = this.msgData.length;
+                    this.msgIsShow = true;
+                }
+                
             }
             
+        },
+        mounted(){
+            this.websocket();
         },
 
         created(){
             this.activeItem = this.$route.meta.menuName;
-            this.getuserinfo();
-            this.websocket();
+            this.showMsg()
+            this.getuserinfo();   
         },
 
         // computed: {

@@ -13,7 +13,4 @@ const loginstatus = function(){
         }
     )
 }
-
-
-
 export default {loginstatus};

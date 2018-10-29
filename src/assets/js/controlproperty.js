@@ -1,10 +1,10 @@
-let systemMonitorPlugin = "ProcessMonitor";
-let aimSdkPlugin = "AimSdk";
-let droidRoot = "DroidRoot";
-let getRepoAppUrl =  "http://172.21.73.109:30001/vuethink/php/index.php/admin/Restrepo/getapkinfo/reponame/aim-market";
-let getRepoToken = "http://172.21.73.109:30001/vuethink/php/index.php/admin/Restrepo/gettoken";
-let repoAppBaseDownloadUrl = "http://172.21.73.109:30002"
-let settingsStatusSensor = {
+const systemMonitorPlugin = "ProcessMonitor";
+const aimSdkPlugin = "AimSdk";
+const droidRoot = "DroidRoot";
+const getRepoAppUrl =  "http://172.21.73.109:30001/vuethink/php/index.php/admin/Restrepo/getapkinfo/reponame/aim-market";
+const getRepoToken = "http://172.21.73.109:30001/vuethink/php/index.php/admin/Restrepo/gettoken";
+const repoAppBaseDownloadUrl = "http://172.21.73.109:30002"
+const settingsStatusSensor = {
     wifi: "/devicectrl/ctrl-wifi",
     bluetooth: "/devicectrl/ctrl-bluetooth",
     lockscreen: "/securityctrl/ctrl-lockscreen", 
@@ -15,8 +15,8 @@ let settingsStatusSensor = {
     backkey: "/interfacectrl/ctrl-backbt",
     homekey: "/interfacectrl/ctrl-homebt"
 };
-let getappinfoSensor="/appctrl/get-all-app-info"
-let appFuncSensor = {
+const getappinfoSensor="/appctrl/get-all-app-info"
+const appFuncSensor = {
     allappinfo: "/appctrl/get-all-app-info",
     disableapp: "/appctrl/disable-some-app",
     enableapp: "/appctrl/enable-some-app",
@@ -27,7 +27,7 @@ let appFuncSensor = {
     stopapp: "/rootctrl/stop-some-app"
 };
 
-let disableAppArray = ["org.flyve.mdm.agent"];
+const disableAppArray = ["org.flyve.mdm.agent"];
 
 export default {
     systemMonitorPlugin,

@@ -3,7 +3,7 @@
         <div class="text-center m-t-20">
             <i class="fa fa-object-group fa-5x m-b-10"></i>
             <p> Device Group</p>
-            <el-select v-model="groupValue" ref="groupId" class="m-t-10" size="small">
+            <el-select v-model="groupValue" ref="groupId" class="m-t-10" size="small" @change="groupChange">
                 <el-option
                     v-for="item in groupOptions"
                     :key="item.value"
@@ -38,58 +38,43 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
+    import deviceApi from '../components/restfulapi/deviceapi'
+    import deviceGroupApi from '../components/restfulapi/devicegroupapi'
+    import handleResponse from '../components/restfulapi/handleresponse'
+
     export default{
         data(){
             return {
                 groupValue:'',
                 devValue: '',
-                groupOptions: '',
-                deviceOptions: ''
+                groupOptions: [],
+                deviceOptions: []
             }
         },
         methods:{
             //value=agentid label=devicename key=did
             getDeviceGroup(){
-                let devGetData = {};
-                devGetData.pageSize = 1000;
-                devGetData.no = 1;
-                devGetData.orderType = "aid";
-                devGetData.like = "";
-                devGetData._ = new Date().getTime();
-                this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
+                this.getDeviceGroupApi(this).then((data) => {
                     this.handleResponse(data, (res) => {
-                        let accountId = res.accounts[0].aid
-                        let groupGetData = {};
-                        groupGetData._ = new Date().getTime();
-                        this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
-                            this.handleResponse(data, (res) => {
-                                let groupData = res.accounts[0].groups
-                                if(groupData.length != 0){
-                                    let groupOptionsData = [];
-                                   groupData.forEach(function(val){
-                                       groupOptionsData.push({value: val.gid, label:val.name})
-                                   }) 
-                                   this.groupValue = groupData[0].gid;
-                                   this.groupOptions = groupOptionsData
-                                   this.getAllDevices();
-                                }
-                            })
-                        })
+                        let groupData = res.accounts[0].groups
+                        if(groupData.length != 0){
+                            let groupOptionsData = [];
+                            groupData.forEach(function(val){
+                                groupOptionsData.push({value: val.gid, label:val.name})
+                            }) 
+                            this.groupValue = groupData[0].gid;
+                            this.groupOptions = groupOptionsData
+                            this.getAllDevices();
+                        }
                     })
-                    
                 })
             },
-
+            groupChange(){
+                this.getAllDevices();
+            },
             getAllDevices(){
                 let groupid = this.groupValue;
-                let devicegetdata = {};
-                devicegetdata.pageSize = 10000;
-                devicegetdata.no = 1;
-                devicegetdata.orderType = "did";
-                devicegetdata.like = "";
-                devicegetdata._ = new Date().getTime();
-                this.apiGet("rmm/v1/devicegroups/"+groupid+"/devices", devicegetdata).then((data) => {
+                this.getDeviceApi(groupid).then((data) => {
                     this.handleResponse(data, (res) => {
                         let deviceData = res.groups[0].devices;
                         if(deviceData.length != 0){
@@ -108,6 +93,8 @@
                             this.deviceOptions = deviceOptionsData;
                             let value = this.devValue;
                             this.deviceChange(value);
+                        }else{
+                            this.deviceOptions = [];
                         }
                     })
                 })
@@ -127,6 +114,7 @@
         created(){
             this.getDeviceGroup();
         },
-        mixins:[http]
+
+        mixins:[deviceApi, deviceGroupApi, handleResponse]
     }
 </script>
