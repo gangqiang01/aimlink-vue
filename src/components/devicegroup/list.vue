@@ -103,7 +103,7 @@
 
 <script>
 
-    import deviceGroupApi from '../restfulapi/devicegroupapi'
+    import {getDeviceGroupApi, deleteGroupApi, addGroupApi} from '../restfulapi/devicegroupapi'
     import handleResponse from '../restfulapi/handleresponse'
     export default{
         data(){
@@ -137,8 +137,8 @@
 
         methods:{
             getDeviceGroup(){
-                this.getDeviceGroupApi(this).then((data) => {
-                    this.handleResponse(data, (res) => {
+                getDeviceGroupApi(this).then((data) => {
+                    handleResponse(data, (res) => {
                         console.log("grouplist",res);
                         this.groupTableData = res.accounts[0].groups;
                         this.form.account = res.accounts[0].fullName;
@@ -159,8 +159,8 @@
                     dangerMode:true,
                 }).then((willDelete) => {
                     if(willDelete){
-                        this.deleteGroupApi(row).then((data) => {
-                            this.handleResponse(data, (res) => {
+                        deleteGroupApi(row).then((data) => {
+                            handleResponse(data, (res) => {
                                 if(res.result){
                                     swal("","Delete group successfully",'success').then(() => {
                                         this.getDeviceGroup();
@@ -185,8 +185,8 @@
 
             addGroup(){
                 this.dialogFormVisible = false;
-                this.addGroupApi(this.aid, '', this.form.groupName, this.form.groupDescription).then((data) => {
-                    this.handleResponse(data, (res) =>{
+                addGroupApi(this.aid, '', this.form.groupName, this.form.groupDescription).then((data) => {
+                    handleResponse(data, (res) =>{
                         if(res.result){
                             swal("", "Add group successfully", "success").then((val) =>{
                                 if(val){
@@ -203,8 +203,6 @@
         created(){
             this.getDeviceGroup();
         },
-
-         mixins:[deviceGroupApi, handleResponse]
     }
 </script>
 <style lang='scss' scoped>

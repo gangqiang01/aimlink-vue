@@ -10,6 +10,7 @@ import _g from './assets/js/global'
 import store from './vuex/store'
 import moment from 'moment';
 import filter from './assets/js/filter'
+import {i18n, vueI18n} from './lang/lang'
 
 import 'element-ui/lib/theme-chalk/index.css'
 import 'font-awesome/css/font-awesome.css'
@@ -33,11 +34,15 @@ axios.defaults.headers['Content-Type'] = 'application/json'
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)
+
+vueI18n(Vue)
+
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
     router,
     store,
-    filter:filter,
+    filter,
+    i18n,
     template: '<router-view></router-view>'
 })

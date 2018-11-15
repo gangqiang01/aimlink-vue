@@ -75,8 +75,8 @@
 </template>
 
 <script>
-    import deviceApi from '../restfulapi/deviceapi'
-    import deviceGroupApi from '../restfulapi/devicegroupapi'
+    import {getUnassignedDevicesApi, addDeviceApi} from '../restfulapi/deviceapi'
+    import {getDeviceGroupApi} from '../restfulapi/devicegroupapi'
     import handleResponse from '../restfulapi/handleresponse'
 
     export default{
@@ -102,8 +102,8 @@
             
             getUnassignedDevices(){
                 _g.openGlobalLoading();
-                this.getUnassignedDevicesApi(this.deviceKeyword).then((data) => {
-                    this.handleResponse(data, (res) =>{
+                getUnassignedDevicesApi(this.deviceKeyword).then((data) => {
+                    handleResponse(data, (res) =>{
                         this.deviceData = res.devices
                         this.dataCount = res.devices.length;
                         if(this.dataCount > 0){
@@ -121,8 +121,8 @@
             },
 
             getDeviceGroup(){
-                this.getDeviceGroupApi(this).then((data) => {
-                    this.handleResponse(data, (res) => {
+                getDeviceGroupApi(this).then((data) => {
+                    handleResponse(data, (res) => {
                         let groupData = res.accounts[0].groups
                         console.log(groupData)
                         if(groupData.length != 0){
@@ -146,8 +146,8 @@
                     swal('', 'Please select device', 'warning');
                     return;
                 }
-                this.addDeviceApi(this.multipleTable, this.form.selectGroup).then((data) => {
-                    this.handleResponse(data, (res) => {
+                addDeviceApi(this.multipleTable, this.form.selectGroup).then((data) => {
+                    handleResponse(data, (res) => {
                         if(res.result){
                             swal("","Add device successfully", 'success').then((val)=>{
                                 if(val){
@@ -168,7 +168,5 @@
             this.getUnassignedDevices();
             this.getDeviceGroup();
         },
-
-         mixins:[deviceApi, deviceGroupApi, handleResponse]
     }
 </script>

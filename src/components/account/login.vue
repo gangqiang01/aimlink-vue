@@ -50,7 +50,7 @@
                 data.password = this.form.password
                 data._now = Date.parse(new Date());
                 data.redirectUri = '172.21.73.144:8081';
-                this.apiGet('/rmm/v1/sso/login', data).then((res) => {
+                this.apiPost('/rmm/v1/sso/login', data).then((res) => {
                     this.loading = false;
                     this.handleResponse(res, (res) => {
                         if(res.status == "passed"){

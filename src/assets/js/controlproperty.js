@@ -15,7 +15,7 @@ const settingsStatusSensor = {
     backkey: "/interfacectrl/ctrl-backbt",
     homekey: "/interfacectrl/ctrl-homebt"
 };
-const getappinfoSensor="/appctrl/get-all-app-info"
+const getAppInfoSensor="/appctrl/get-all-app-info"
 const appFuncSensor = {
     allappinfo: "/appctrl/get-all-app-info",
     disableapp: "/appctrl/disable-some-app",
@@ -29,7 +29,7 @@ const appFuncSensor = {
 
 const disableAppArray = ["org.flyve.mdm.agent"];
 
-export default {
+export {
     systemMonitorPlugin,
     aimSdkPlugin,
     droidRoot,
@@ -37,7 +37,7 @@ export default {
     getRepoToken,
     repoAppBaseDownloadUrl,
     settingsStatusSensor,
-    getappinfoSensor,
+    getAppInfoSensor,
     appFuncSensor,
     disableAppArray
 }

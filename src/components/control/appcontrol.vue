@@ -98,7 +98,7 @@
 <script>
     import http from '@/assets/js/http'
     import selectGroup from '../../common/select-group'
-    import controlProperty from '@/assets/js/controlproperty'
+    import {aimSdkPlugin, getAppInfoSensor, getRepoAppUrl, getRepoToken} from '@/assets/js/controlproperty'
     import Chart from 'chart.js'
 
     export default{
@@ -124,8 +124,8 @@
                 let deviceid;
                 let GetSensorsData={};
                 GetSensorsData.agentId = this.selectedAgentId;
-                GetSensorsData.plugin = controlProperty.aimSdkPlugin;
-                GetSensorsData.sensorId = controlProperty.getappinfoSensor;
+                GetSensorsData.plugin = aimSdkPlugin;
+                GetSensorsData.sensorId = getAppInfoSensor;
                 deviceid = this.selectedDeviceId;
                 GetSensorsData._ = Date.parse(new Date());
                 let myurl = "rmm/v1/devicectrl/"+deviceid+"/data";
@@ -133,7 +133,7 @@
                     this.handleResponse(obj, (res) => {
                         let sensorarray = res.sensorIds;
                         sensorarray.forEach(function(val){
-                            if(sensorid == controlProperty.aimSdkPlugin+AppFuncSensor.allappinfo){
+                            if(sensorid === aimSdkPlugin+AppFuncSensor.allappinfo){
                                 let apppackageinfo = JSON.parse(val.sv);
                                 this.appOptions = apppackageinfo.data;
                                 this.getRepoApps(AppManagementInfoArray, deviceapparray);
@@ -156,8 +156,8 @@
                 let token;
                 let InstallAppManagementInfo = {};
                 let UpgradeAppManagementInfo = {};
-                let AppInfoUrl = controlProperty.getRepoAppUrl;
-                let repourl = controlProperty.getRepoToken;
+                let AppInfoUrl = getRepoAppUrl;
+                let repourl = getRepoToken;
 
                 let formData = {username:"jinxin",passwd:"jinxin"};
                 let info_data;
@@ -227,7 +227,7 @@
                             let setsensordata = {};
                             setsensorid = AppFuncSensor[cid]; 
                             setsensordata.agentId = this.selectedAgentId;
-                            setsensordata.plugin = controlProperty.aimSdkPlugin;
+                            setsensordata.plugin = aimSdkPlugin;
                             setsensordata.sensorIds = [];
                             setsensordata.sensorIds[0]={"n":setsensorid, "sv":setsensorval};
                             this.apiPost("rmm/v1/devicectrl/data",setsensordata).then((data) => {
@@ -247,7 +247,7 @@
                     let setsensordata = {};
                     setsensorid = AppFuncSensor[cid]; 
                     setsensordata.agentId = this.selectedAgentId;
-                    setsensordata.plugin = cid == "stopapp" ? DroidRoot : controlProperty.aimSdkPlugin;
+                    setsensordata.plugin = cid === "stopapp" ? DroidRoot : aimSdkPlugin;
                     setsensordata.sensorIds = [];
                     setsensordata.sensorIds[0]={"n":setsensorid, "sv":setsensorval};
                     $("#page_loading").show();
@@ -263,13 +263,13 @@
                 }
             },
             appAction(cid, selectedAppData){
-                if(cid == "installapp"){
+                if(cid === "installapp"){
                     var appname= selectedAppData[0];
                     var pkgname= selectedAppData[1];
                     var versionname = selectedAppData[2];
                     var reponame = "95cbbb6613127668fdd633b2cc006d47";
                     setsensorval = RepoAppBaseDownloadUrl + "/"+ reponame +"/" + pkgname +　"/" + versionname + "/" + appname;
-                }else if(cid == "upgradeapp"){
+                }else if(cid === "upgradeapp"){
                     var appname= selectedAppData[4];
                     var pkgname= selectedAppData[1];
                     var versionname = selectedAppData[5];

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="m-t-10 ">
-            <p class="header-line"><i class="fa fa-server c-blue m-r-10" aria-hidden="true"></i> Device List </p>
+            <p class="header-line"><i class="fa fa-server c-blue m-r-10" aria-hidden="true"></i>{{$t('device.deviceList')}}</p>
         </div>
         <div class="m-t-20">
             <div class="panel-header">
@@ -96,8 +96,8 @@
 </template>
 
 <script>
-    import deviceApi from '../restfulapi/deviceapi'
-    import deviceGroupApi from '../restfulapi/devicegroupapi'
+    import {getDeviceApi, deleteDeviceApi} from '../restfulapi/deviceapi'
+    import {getDeviceGroupApi} from '../restfulapi/devicegroupapi'
     import handleResponse from '../restfulapi/handleresponse'
 
     export default{
@@ -124,8 +124,8 @@
 
         methods:{
             getDeviceGroup(){
-                this.getDeviceGroupApi(this).then((data) => {
-                    this.handleResponse(data, (res) => {
+                getDeviceGroupApi(this).then((data) => {
+                    handleResponse(data, (res) => {
                         let groupData = res.accounts[0].groups
                         console.log(groupData)
                         if(groupData.length != 0){
@@ -146,8 +146,8 @@
 
             getAllDevices(){
                 let groupid = this.selectValue;
-                this.getDeviceApi(groupid).then((data) => {
-                    this.handleResponse(data, (res) => { 
+                getDeviceApi(groupid, this.deviceKeyword).then((data) => {
+                    handleResponse(data, (res) => { 
                         this.deviceTableData = res.groups[0].devices;
                         this.dataCount = this.deviceTableData.length;
                         this.deviceList = this.deviceTableData.slice(0,this.limit)
@@ -172,8 +172,8 @@
                     dangerMode:true,
                 }).then((willDelete) => {
                     if(willDelete){
-                        this.DeleteDeviceApi(row).then((data) => {
-                            this.handleResponse(data, (res)=>{
+                        deleteDeviceApi(row).then((data) => {
+                            handleResponse(data, (res)=>{
                                 if(res.result){
                                     swal("", "Delete successfully", "success").then(() => {
                                         this.getAllDevices();
@@ -212,8 +212,8 @@
                 }).then((willDelete) => {
                     this.deleteLoading = !this.deleteLoading;
                     if(willDelete){
-                        this.DeleteDeviceApi(multipleTable).then((data) => {
-                            this.handleResponse(data, (res)=>{
+                        deleteDeviceApi(this.multipleTable).then((data) => {
+                            handleResponse(data, (res)=>{
                                 if(res.result){
                                     swal("", "Delete successfully", "success").then(() => {
                                         this.getAllDevices();
@@ -236,7 +236,6 @@
         created(){
             this.getDeviceGroup();
         },
-        mixins:[deviceApi, deviceGroupApi, handleResponse]
     }
 </script>
 <style lang='scss' scoped>

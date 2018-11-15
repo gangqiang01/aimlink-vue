@@ -38,8 +38,8 @@
 </template>
 
 <script>
-    import deviceApi from '../components/restfulapi/deviceapi'
-    import deviceGroupApi from '../components/restfulapi/devicegroupapi'
+    import {getDeviceApi} from '../components/restfulapi/deviceapi'
+    import {getDeviceGroupApi} from '../components/restfulapi/devicegroupapi'
     import handleResponse from '../components/restfulapi/handleresponse'
 
     export default{
@@ -54,8 +54,8 @@
         methods:{
             //value=agentid label=devicename key=did
             getDeviceGroup(){
-                this.getDeviceGroupApi(this).then((data) => {
-                    this.handleResponse(data, (res) => {
+                getDeviceGroupApi(this).then((data) => {
+                    handleResponse(data, (res) => {
                         let groupData = res.accounts[0].groups
                         if(groupData.length != 0){
                             let groupOptionsData = [];
@@ -74,8 +74,8 @@
             },
             getAllDevices(){
                 let groupid = this.groupValue;
-                this.getDeviceApi(groupid).then((data) => {
-                    this.handleResponse(data, (res) => {
+                getDeviceApi(groupid).then((data) => {
+                    handleResponse(data, (res) => {
                         let deviceData = res.groups[0].devices;
                         if(deviceData.length != 0){
                             let deviceOptionsData = [];
@@ -114,7 +114,5 @@
         created(){
             this.getDeviceGroup();
         },
-
-        mixins:[deviceApi, deviceGroupApi, handleResponse]
     }
 </script>

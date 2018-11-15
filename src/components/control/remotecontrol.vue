@@ -128,7 +128,7 @@
 <script>
     import http from '@/assets/js/http'
     import selectGroup from '../../common/select-group'
-    import controlProperty from '@/assets/js/controlproperty'
+    import {aimSdkPlugin, getAppInfoSensor, settingsStatusSensor} from '@/assets/js/controlproperty'
 
     export default{
         data(){
@@ -153,8 +153,8 @@
                 let deviceid;
                 let GetSensorsData={};
                 GetSensorsData.agentId = this.selectedAgentId;
-                GetSensorsData.plugin = controlProperty.aimSdkPlugin;
-                GetSensorsData.sensorId = controlProperty.getappinfoSensor;
+                GetSensorsData.plugin = aimSdkPlugin;
+                GetSensorsData.sensorId = getappinfoSensor;
                 deviceid = this.selectedDeviceId;
                 GetSensorsData._ = Date.parse(new Date());
                 let myurl = "rmm/v1/devicectrl/"+deviceid+"/data";
@@ -163,8 +163,8 @@
                         let sensorarray = res.sensorIds;
                         sensorarray.forEach(function(val){
                             let sensorid = val.sensorId;
-                            for(let sensor_key in controlProperty.settingsStatusSensor){
-                                if(sensorid == controlProperty.aimSdkPlugin+controlProperty.settingsStatusSensor[sensor_key] ){
+                            for(let sensor_key in settingsStatusSensor){
+                                if(sensorid == aimSdkPlugin+settingsStatusSensor[sensor_key] ){
                                     if(val.bv != undefined){
                                         let sensorval = val.bv;
                                         this.sensor_key = sensorval;
@@ -185,23 +185,23 @@
                 let setsensorid,setsensorval;
                 switch(cid) {
                     case "wifi":
-                        setsensorid = controlProperty.settingsStatusSensor.wifi;
+                        setsensorid = settingsStatusSensor.wifi;
 
                         break;
                     case "bluetooth":
-                        setsensorid = controlProperty.settingsStatusSensor.bluetooth;
+                        setsensorid = settingsStatusSensor.bluetooth;
 
                         break;
                     case "lockscreen":
-                        setsensorid = controlProperty.settingsStatusSensor.lockscreen;
+                        setsensorid = settingsStatusSensor.lockscreen;
 
                         break;
                     case "backkey":
-                        setsensorid = controlProperty.settingsStatusSensor.backkey;
+                        setsensorid = settingsStatusSensor.backkey;
 
                         break;
                     case "homekey":
-                        setsensorid = controlProperty.settingsStatusSensor.homekey;
+                        setsensorid = settingsStatusSensor.homekey;
 
                         break;
                     default:
@@ -215,7 +215,7 @@
                     return;
                 }
                 setsensordata.agentId = this.selectedAgentId;
-                setsensordata.plugin = controlProperty.AimSdkPlugin;
+                setsensordata.plugin = AimSdkPlugin;
                 setsensordata.sensorIds = [];
                 setsensordata.sensorIds[0]={"n":setsensorid, "bv":setsensorval};
                 this.apiPost("rmm/v1/devicectrl/data",setsensordata).then((data) => {

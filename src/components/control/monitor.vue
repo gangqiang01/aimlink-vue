@@ -18,7 +18,7 @@
 <script>
     import http from '@/assets/js/http'
     import selectGroup from '../../common/select-group'
-    import controlProperty from '@/assets/js/controlproperty'
+    import {systemMonitorPlugin} from '@/assets/js/controlproperty'
     import Chart from 'chart.js'
 
     export default{
@@ -59,7 +59,7 @@
                     let intervalTime = 1,timeoutTime = 60
                     let intervalReportData = {};
                     intervalReportData.agentid = SelectedAgentId;
-                    intervalReportData.plugin = controlProperty.systemMonitorPlugin;
+                    intervalReportData.plugin = systemMonitorPlugin;
                     intervalReportData.interval = intervalTime;
                     intervalReportData.timeout = timeoutTime;
                     this.apiPut("rmm/v1/devicectrl/intermittent_report", intervalReportData).then((data) => {
@@ -82,7 +82,7 @@
                 let cpuNowPercentage, MemoryNowPercentage;
                 let GetSystemMonitorData = {};
                 GetSystemMonitorData.agentId = SelectedAgentId;
-                GetSystemMonitorData.plugin = controlProperty.systemMonitorPlugin;
+                GetSystemMonitorData.plugin = systemMonitorPlugin;
                 GetSystemMonitorData._ = new Date().getTime();
                 DeviceId = SelectedDeviceId;
                 let myurl = "rmm/v1/data/devices/"+DeviceId+"/latestdata";
