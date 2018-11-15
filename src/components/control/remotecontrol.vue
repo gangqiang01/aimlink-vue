@@ -131,6 +131,7 @@
     import {aimSdkPlugin, getAppInfoSensor, settingsStatusSensor} from '@/assets/js/controlproperty'
 
     export default{
+        name: 'controlRemotecontrol',
         data(){
             return {
                 wifi: true,

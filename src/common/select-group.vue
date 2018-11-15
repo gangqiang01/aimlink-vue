@@ -43,6 +43,7 @@
     import handleResponse from '../components/restfulapi/handleresponse'
 
     export default{
+        name: 'selectGroup',
         data(){
             return {
                 groupValue:'',

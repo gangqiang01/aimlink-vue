@@ -144,6 +144,7 @@
     import homeFooter from './main/footer'
 
     export default {
+        name: 'home',
         data() {
             return {
                 isCollapse: false,

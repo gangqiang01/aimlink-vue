@@ -22,6 +22,7 @@
     import Chart from 'chart.js'
 
     export default{
+        name: 'controlMonitor',
         data(){
             return {
                 deviceMonitorTimer: undefined,

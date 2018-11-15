@@ -106,6 +106,7 @@
     import {getDeviceGroupApi, deleteGroupApi, addGroupApi} from '../restfulapi/devicegroupapi'
     import handleResponse from '../restfulapi/handleresponse'
     export default{
+        name: 'devicegroupList',
         data(){
             return{
                 groupTableData:[],

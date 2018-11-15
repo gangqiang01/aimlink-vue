@@ -80,6 +80,7 @@
     import handleResponse from '../restfulapi/handleresponse'
 
     export default{
+        name: 'deviceAdd',
         data(){
             return {
                 deviceData: [],

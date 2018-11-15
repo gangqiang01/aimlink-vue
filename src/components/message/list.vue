@@ -124,6 +124,7 @@
     import http from '@/assets/js/http'
     import btnGroup from '@/common/btn-group'
     export default{
+        name: 'messageList',
         data(){
             return{
                 messageList:[],
@@ -133,7 +134,7 @@
                 categoryValue:'',
                 isshow: false,
                 groupValue: '',
-                severityValue: '',
+                severityValue: 'All',
                 dataCount: null,
                 currentPage: 1,
                 groupOptions: [],
@@ -144,10 +145,6 @@
                     {value: "Warning", label: "Warning"},
                     {value: "Error", label: "Error"}
                 ],
-                groupValue:'',
-                categoryValue: '',
-                severityValue: ''
-
 
             }
         },
@@ -175,7 +172,7 @@
                                     groupData.forEach(function(val){
                                         groupOptionsData.push({value: val.gid, label:val.name})
                                     }) 
-                                    this.selectValue = groupData[0].gid;
+                                    this.groupValue = groupData[0].gid;
                                     this.groupOptions = groupOptionsData
                                 }else{
                                     this.groupOptions = [];
@@ -270,7 +267,7 @@
         created(){
             this.getDeviceGroup();
             this.getDeviceCategory();
-            this. getEventMessages();
+            this.getEventMessages();
         },
 
         mixins:[http]

@@ -16,12 +16,12 @@
                         <i class="fa fa-bell-o fa-x header-bell" aria-hidden="true"></i>
                     </el-badge> 
                     <el-dropdown-menu slot="dropdown" >
-                            <el-dropdown-item v-show='!msgIsShow' class="text-center fz-18 c-primary">
+                        <el-dropdown-item v-show='!msgIsShow' class="text-center fz-18 c-primary">
                             <span>
                                 <i class="fa fa-bell-slash-o m-r-10" aria-hidden="true"></i>No new notifications
                             </span>
                         </el-dropdown-item>
-                        <el-dropdown-item v-show='msgIsShow' class="text-center fz-18">
+                        <el-dropdown-item v-show='msgIsShow' class="text-center fz-18 msgHeader">
                             you have {{msgCount}} new notifications
                         </el-dropdown-item>
                         <div class="msgContainer">
@@ -155,28 +155,15 @@
                             
         }
     }
-    // .home_userinfo{
-    //     display: flex;
-    //     flex-direction: column;
-    //     min-width:3rem;
-    //     li{
-    //         display: flex;
-    //         flex-direction: column;
-    //         align-items: center;
-    //         &:nth-child(2){
-    //             align-items: flex-start;
-    //             align-items: flex-start;
-    //         }
-    //         &:nth-child(3){
-    //             align-self: flex-end;
-    //         }
-    //     }
-    // } 
     .msgContainer{
         max-height: 22rem;
         max-width: 20rem;
         overflow-y: scroll;
         overflow-x: hidden;
+    }
+    .msgHeader{
+        color: $primary-color;
+        font-weight: 700;
     }
 </style>
 <script>
@@ -187,6 +174,7 @@
     import {setLang} from '../../lang/lang'
 
     export default{
+        name: 'mainHeader',
         data(){
             return {
                 img:"",
@@ -231,7 +219,7 @@
                     console.log("Connection open ..."); 
                 };
                 ws.onmessage = (eventJson) => {
-                    console.log("msgenter");
+                    console.log("websocket msg enter");
                     let msgOrgData = JSON.parse(eventJson.data).events;
                     if(msgOrgData.length != 0){
                         msgOrgData = msgOrgData.map((val)=> {

@@ -101,6 +101,7 @@
     import handleResponse from '../restfulapi/handleresponse'
 
     export default{
+        name: 'deviceList',
         data(){
             return{
                 groupOptions:[],

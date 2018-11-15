@@ -29,6 +29,7 @@
     import uuid from '@/thirdpackage/shellinabox/uuid-random'
 
     export default{
+        name: 'terminalList',
         data(){
             return {
                 selectedAgentId: '',

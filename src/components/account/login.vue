@@ -20,26 +20,27 @@
     import http from '../../assets/js/http'
 
     export default {
+        name: 'login',
         data() {
-        return {
-            title: '',
-            systemName: 'AIM Android Rmm extension',
-            loading: false,
-            form: {
-                username: '',
-                password: '',
-            },
+            return {
+                title: '',
+                systemName: 'AIM Android Rmm extension',
+                loading: false,
+                form: {
+                    username: '',
+                    password: '',
+                },
 
-            rules2: {
-            username: [
-                { required: true, message: '请输入账号', trigger: 'blur' }
-            ],
-            password: [
-                { required: true, message: '请输入密码', trigger: 'blur' }
-            ]
-            },
-            checked: false
-        }
+                rules2: {
+                username: [
+                    { required: true, message: '请输入账号', trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: '请输入密码', trigger: 'blur' }
+                ]
+                },
+                checked: false
+            }
         },
         methods: {
             handleSubmit2() {

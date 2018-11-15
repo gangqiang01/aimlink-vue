@@ -102,6 +102,7 @@
     import Chart from 'chart.js'
 
     export default{
+        name: 'controlAppcontrol',
         data(){
             return {
                 activeName: "appaction",

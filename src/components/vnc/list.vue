@@ -29,6 +29,7 @@
     import RFB from '@/thirdpackage/noVNC/core/rfb.js';
 
     export default{
+        name: 'vncList',
         data(){
             return {
                 selectedAgentId: '',
