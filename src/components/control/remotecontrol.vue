@@ -16,7 +16,7 @@
                         v-model="wifi"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
-                        @change="switchChange($event, 'wifi')"
+                        @change="switchChange(wifi, 'wifi')"
                         >
                         </el-switch>
                     </div>
@@ -31,7 +31,7 @@
                         v-model="bluetooth"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
-                        @change="switchChange($event, 'bluetooth')"
+                        @change="switchChange(bluetooth, 'bluetooth')"
                         >
                         </el-switch>
                     </div>
@@ -46,7 +46,7 @@
                         v-model="gps"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
-                        @change="switchChange($event, 'gps')"
+                        @change="switchChange(gps, 'gps')"
                         >
                         </el-switch>
                         
@@ -63,7 +63,7 @@
                         v-model="lockscreen"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
-                        @change="switchChange($event, 'lockscreen')"
+                        @change="switchChange(lockscreen, 'lockscreen')"
                         >
                         </el-switch>
                     </div>
@@ -78,7 +78,7 @@
                         v-model="homekey"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
-                        @change="switchChange($event, 'homekey')"
+                        @change="switchChange(homekey, 'homekey')"
                         >
                         </el-switch>
                     </div>
@@ -93,7 +93,7 @@
                         v-model="backkey"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
-                        @change="switchChange($event, 'backkey')"
+                        @change="switchChange(backkey, 'backkey')"
                         >
                         </el-switch>
                     </div>
@@ -126,9 +126,10 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
+    import {getSensorStatusApi, setSensorStatusApi, powerActionApi } from '../restfulapi/remotecontrol'
     import selectGroup from '../../common/select-group'
-    import {aimSdkPlugin, getAppInfoSensor, settingsStatusSensor} from '@/assets/js/controlproperty'
+    import {aimSdkPlugin, getAppInfoSensor, getRepoAppUrl, getRepoToken} from '@/assets/js/controlproperty'
+    import handleResponse from '../restfulapi/handleresponse'
 
     export default{
         name: 'controlRemotecontrol',
@@ -151,15 +152,7 @@
             getSensorStatus(){
                 let AppManagementInfoArray = [];
                 let deviceapparray = [];
-                let deviceid;
-                let GetSensorsData={};
-                GetSensorsData.agentId = this.selectedAgentId;
-                GetSensorsData.plugin = aimSdkPlugin;
-                GetSensorsData.sensorId = getappinfoSensor;
-                deviceid = this.selectedDeviceId;
-                GetSensorsData._ = Date.parse(new Date());
-                let myurl = "rmm/v1/devicectrl/"+deviceid+"/data";
-                this.apiGet(myurl, GetSensorsData).then((obj) => {
+                getSensorStatusApi(this.selectedDeviceId, getAppInfoSensor, this.selectedAgentId, aimSdkPlugin).then((obj) => {
                     this.handleResponse(obj, (res) => {
                         let sensorarray = res.sensorIds;
                         sensorarray.forEach(function(val){
@@ -167,8 +160,7 @@
                             for(let sensor_key in settingsStatusSensor){
                                 if(sensorid == aimSdkPlugin+settingsStatusSensor[sensor_key] ){
                                     if(val.bv != undefined){
-                                        let sensorval = val.bv;
-                                        this.sensor_key = sensorval;
+                                        this.sensor_key = val.bv;
                                     }
 
                                 
@@ -180,47 +172,17 @@
                     
                 })
             },
-           switchChange(event, cid){
-               console.log(event,cid)
-                let setsensordata = {};
-                let setsensorid,setsensorval;
-                switch(cid) {
-                    case "wifi":
-                        setsensorid = settingsStatusSensor.wifi;
+           switchChange(setsensorval, cid){
 
-                        break;
-                    case "bluetooth":
-                        setsensorid = settingsStatusSensor.bluetooth;
-
-                        break;
-                    case "lockscreen":
-                        setsensorid = settingsStatusSensor.lockscreen;
-
-                        break;
-                    case "backkey":
-                        setsensorid = settingsStatusSensor.backkey;
-
-                        break;
-                    case "homekey":
-                        setsensorid = settingsStatusSensor.homekey;
-
-                        break;
-                    default:
-                        break;
-                }
-                setsensorval = event;
+                let setsensorid = this.cid;
                 if(this.electedAgentId == ''){
                     swal("","Please select your device","info").then(function(){
                         this.cid = true;
                     })
                     return;
                 }
-                setsensordata.agentId = this.selectedAgentId;
-                setsensordata.plugin = AimSdkPlugin;
-                setsensordata.sensorIds = [];
-                setsensordata.sensorIds[0]={"n":setsensorid, "bv":setsensorval};
-                this.apiPost("rmm/v1/devicectrl/data",setsensordata).then((data) => {
-                    this.handleResponse(data, (res) =>{
+                setSensorStatusApi(setSensorId, setsensorval, this.selectedAgentId, AimSdkPlugin).then((data) => {
+                    handleResponse(data, (res) =>{
                         if(res.items[0].statusCode == "200"){
                             swal("","success","success");
                         }else{
@@ -229,8 +191,8 @@
                     })
                     
                 })
-           },
-           powerAction(cid){
+            },
+            powerAction(cid){
                 if(this.selectedDeviceId == ''){
                     swal("","Please select your device","info")
                     return;
@@ -244,11 +206,8 @@
                 })
                 .then(function(willfunc){
                     if (willfunc) {
-                        let powdata = {};
-                        powdata.action = cid;
-                        powdata.did = this.selectedDeviceId;
-                        this.apiPut("rmm/v1/power/device", powdata).then((data) => {
-                            this.handleResponse(data, (res) => {
+                        powerActionApi(cid, this.selectedDeviceId).then((data) => {
+                            handleResponse(data, (res) => {
                                 if(data.result == true){
                                     swal("", cid+" success", "success")
                                 }
@@ -268,8 +227,6 @@
         mounted(){
 
         },
-
-        mixins:[http]
 
     }
 </script>

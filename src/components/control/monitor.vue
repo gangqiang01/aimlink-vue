@@ -16,16 +16,19 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
+    import {startIntermittentApi, getDeviceStatusApi} from '../restfulapi/monitorapi'
     import selectGroup from '../../common/select-group'
     import {systemMonitorPlugin} from '@/assets/js/controlproperty'
     import Chart from 'chart.js'
+    import handleResponse from '../restfulapi/handleresponse'
 
     export default{
         name: 'controlMonitor',
         data(){
             return {
                 deviceMonitorTimer: undefined,
+                deviceId:'',
+                selectedAgentId:''
             }
         },
         components:{
@@ -55,21 +58,14 @@
                 }
                 return options;
             },
-            startDeviceMonitor(DeviceId, SelectedAgentId){
+            startDeviceMonitor(selectedAgentId, deviceId){
                 if(this.deviceMonitorTimer == undefined){
-                    let intervalTime = 1,timeoutTime = 60
-                    let intervalReportData = {};
-                    intervalReportData.agentid = SelectedAgentId;
-                    intervalReportData.plugin = systemMonitorPlugin;
-                    intervalReportData.interval = intervalTime;
-                    intervalReportData.timeout = timeoutTime;
-                    this.apiPut("rmm/v1/devicectrl/intermittent_report", intervalReportData).then((data) => {
-                        this.handleResponse(data, (res) =>{
+                    startIntermittentApi(selectedAgentId, systemMonitorPlugin).then((data) => {
+                        handleResponse(data, (res) =>{
                             if(res.result = true){
-                                getSensorStatus();
-                                deviceMonitor();
+                                this.deviceMonitor();
                                 this.deviceMonitorTimer = window.setInterval(function(){
-                                    deviceMonitor()
+                                    deviceMonitor(selectedAgentId, deviceId)
                                 },3000)
                             }else{
                                 console.log("inetervalreport error")
@@ -79,23 +75,17 @@
                     })
                 }
             },
-            deviceMonitor(DeviceId, SelectedAgentId){
+            deviceMonitor(selectedAgentId, deviceId){
                 let cpuNowPercentage, MemoryNowPercentage;
-                let GetSystemMonitorData = {};
-                GetSystemMonitorData.agentId = SelectedAgentId;
-                GetSystemMonitorData.plugin = systemMonitorPlugin;
-                GetSystemMonitorData._ = new Date().getTime();
-                DeviceId = SelectedDeviceId;
-                let myurl = "rmm/v1/data/devices/"+DeviceId+"/latestdata";
-                this.apiGet(myurl, GetSystemMonitorData).then((data) =>{
-                    this.handleResponse(data, (res)=>{
-                        if(data.connected == false){
+                getDeviceStatusApi(deviceId, selectedAgentId, systemMonitorPlugin).then((data) =>{
+                    handleResponse(data, (res)=>{
+                        if(res.connected == false){
                             swal("","this Device has been offline","info").then(function(){
                                 window.clearInterval(this.deviceMonitorTimer);
                                 return;
                             });
 
-                        }else if(data.ProcessMonitor == undefined){
+                        }else if(res.ProcessMonitor == undefined){
                             swal("","your data miss","info").then(
                                 function(){
                                     window.clearInterval(this.deviceMonitorTimer)
@@ -203,7 +193,7 @@
             },
 
             getDeviceOption(msg){
-                this.startDeviceMonitor(msg.key, msg.value);
+                this.startDeviceMonitor( msg.key, msg.value);
             }
         },
 
@@ -211,9 +201,6 @@
             this.drawCpuChart(this.cpudata)
             this.drawMemoryChart(this.memorydata)
         },
-
-        mixins:[http]
-
     }
 </script>
 

@@ -1,4 +1,5 @@
-import {apiGet, apiPost, apiPut} from "../../assets/js/baseapi";
+
+import {apiGet, apiPost, apiPut, repoApiGet, repoApiPost} from "../../assets/js/baseapi";
 
 
 let getSensorStatusApi = function(did, sensorId, agentId, plugin){
@@ -31,7 +32,6 @@ let setSensorStatusApi = function(setSensorId, setsensorval, selectedAgentId, pl
                 }
             ],
         };
-        
         apiPost("rmm/v1/devicectrl/data",setsensordata).then((data) => {
             resolve(data);
         }).catch((error) => {
@@ -40,43 +40,42 @@ let setSensorStatusApi = function(setSensorId, setsensorval, selectedAgentId, pl
     })
 }
 
-let startIntermittentApi = function(DeviceId, selectedAgentId, plugin){
+let getRepoAppsApi = function(repoUrl, appInfoUrl){
     return new Promise((resolve, reject) => {
-        let intervalReportData = {
-            agentid = selectedAgentId,
-            plugin = plubin,
-            interval = 1,
-            timeout = 60,
-        };
 
-        apiPut("rmm/v1/devicectrl/intermittent_report", intervalReportData).then((data) => {
-            resolve(data);
-        }).catch((error) => {
-            resolve(err.response);
+        let AppInfoUrl = getRepoAppUrl;
+        let repourl = getRepoToken;
+        let formData = {username:"jinxin",passwd:"jinxin"};
+        let info_data;
+        repoApiPost(repourl, formData).then((token_data) =>{
+            let token = token_data.token;
+            repoApiGet(AppInfoUrl, info_data, token).then((data) => {
+                resolve(data);
+            }).catch((error) => {
+                resolve(err.response);
+            })
         })
     })
 }
-let getDeviceStatus = function(SelectedDeviceId){
+
+let powerActionApi = function(action, selectedDeviceId){
     return new Promise((resolve, reject) => {
-        let GetSystemMonitorData = {
-            agentId: selectedAgentId,
-            plugin: plugin,
-            _: new Date().getTime(),
+
+        let powdata = {
+            action: action,
+            did: selectedDeviceId
         };
-        let myurl = "rmm/v1/data/devices/"+SelectedDeviceId+"/latestdata";
-        apiGet(myurl, GetSystemMonitorData).then((data) =>{
+        apiPut("rmm/v1/power/device", powdata).then((data) => {
             resolve(data);
         }).catch((error) => {
             resolve(err.response);
         })
     })
 }
-    
 
 export {
     getSensorStatusApi,
     setSensorStatusApi,
-    startDeviceMonitorApi,
-    startIntermittentApi,
-    getDeviceStatus
+    getRepoAppsApi,
+    powerActionApi 
 }

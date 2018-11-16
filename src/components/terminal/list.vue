@@ -52,7 +52,7 @@
                 var host = "portal-rmm.wise-paas.com";
                 
                 $("#vt100").hide();
-                var iframeSrcMsg=`../../thirdpackage/shellinabox/webshell.html?agentID=${agentid}&sessionID=${sessionid}&host=${host}&type=SSO`;
+                var iframeSrcMsg=`../../thirdpackage/shellinabox/webshell.html?agentID=${agentid}&sessionID=${sessionid}&host=${host}&type=${type}`;
                 console.log($("#terminal_iframe").attr("attr"));
                 $("#terminal_iframe").attr("src",iframeSrcMsg);
                 $("#Terminal_closed").show();

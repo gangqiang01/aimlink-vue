@@ -33,7 +33,8 @@
         data(){
             return {
                 selectedAgentId: '',
-                selectedDeviceId: ''
+                selectedDeviceId: '',
+                rfb: null,
             }
         },
         components:{
@@ -41,8 +42,8 @@
         },
         methods: {
             disconnectVNC(){
-                if(rfb != undefined){
-                    rfb._sock.close()
+                if(this.rfb != null){
+                    this.rfb._sock.close()
                 };
             },
 
@@ -51,11 +52,7 @@
                     swal("","Please select your device","info")
                     return;
                 }
-                var getPatamsData={};
-                getPatamsData.agentid = this.selectedAgentId;
-                getPatamsData.mode = vnc_mode;
-                getPatamsData.repeaterid = repeaterId;
-                this.apiPost("rmm/v1/kvm",getPatamsData).then((data) =>{
+               getVNCPropertysApi(this.selectedAgentId).then((data) =>{
                     handleResponse(data, (res) => {
                         this.startVNC(res.IP, res.port, res.password, "");
                     })
@@ -70,9 +67,9 @@
 
             status(text, level) {
                 var vncContentMsg = ` <h2 class="VNC_title">VNC To Your Device</h2>
-                        <el-button type="primary"  @click="startVNC">
-                            <i class="fa fa-link"></i> Connect
-                        </el-button>`;
+                    <el-button type="primary"  @click="startVNC">
+                        <i class="fa fa-link"></i> Connect
+                    </el-button>`;
                 switch (level) {
                     case 'normal':
                     case 'warn':
@@ -99,19 +96,17 @@
 
             connected(e) {
                 if (WebUtil.getConfigVar('encrypt',true)) {
-                    status("Connected (encrypted) to " + desktopName, "normal");
-
-
+                    this.status("Connected (encrypted) to " + desktopName, "normal");
                 } else {
-                    status("Connected (unencrypted) to " + desktopName, "normal");
+                    this.status("Connected (unencrypted) to " + desktopName, "normal");
                 }
             },
 
             disconnected(e) {
                 if (e.detail.clean) {
-                    status("Disconnected", "normal");
+                    this.status("Disconnected", "normal");
                 } else {
-                    status("Something went wrong, connection is closed", "error");
+                    this.status("Something went wrong, connection is closed", "error");
                 }
             },
 
@@ -142,16 +137,16 @@
                 }
                 url += '/' + path;
 
-                rfb = new RFB(document.getElementById('noVNC_content'), url,
+                this.rfb = new RFB(document.getElementById('noVNC_content'), url,
                             { repeaterID: repeaterId,
                                 shared: true,
                                 credentials: { password: password } });
-                rfb.viewOnly = WebUtil.getConfigVar('view_only', false);
-                rfb.addEventListener("connect",  connected);
-                rfb.addEventListener("disconnect", disconnected);
-                rfb.addEventListener("desktopname", updateDesktopName);
-                rfb.scaleViewport = true;
-                rfb.resizeSession = WebUtil.getConfigVar('resize', false);
+                this.rfb.viewOnly = WebUtil.getConfigVar('view_only', false);
+                this.rfb.addEventListener("connect",  this.connected);
+                this.rfb.addEventListener("disconnect", this.disconnected);
+                this.rfb.addEventListener("desktopname", this.updateDesktopName);
+                this.rfb.scaleViewport = true;
+                this.rfb.resizeSession = WebUtil.getConfigVar('resize', false);
             },
             getDeviceOption(msg){
                 this.selectedAgentId = msg.label;

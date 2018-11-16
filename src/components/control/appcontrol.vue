@@ -5,53 +5,54 @@
             <select-group @select-device="getDeviceOption"></select-group>
         </el-col>
         <el-col :span="18" class="m-t-20">
-             <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="App Action" name="appaction">
                     <el-form ref="form" :model="form" label-width="150px" class="m-t-20 m-l-30">
                          <el-form-item label="Launch App:" >
-                            <el-select v-model="form.launchapp" placeholder="Please select app" class="w-300" size="small">
-                                <el-option
-                                    v-for="item in appOptions"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
-                                </el-option>    
-                            </el-select>
-                            <el-button type="primary" size="small" @click="appAction('launchapp')" class="m-l-10">Launch</el-button>
-                        </el-form-item>
-                        <el-form-item label="Stop App:">
-                            <el-select v-model="form.stopapp" placeholder="Please select app" class="w-300" size="small">
+                            <el-select v-model="launchapp" placeholder="Please select app" class="w-300" size="small">
                                 <el-option
                                     v-for="item in appOptions"
                                     :key="item.packageName"
-                                    :label="item.appNamw"
+                                    :label="item.label"
                                     :value="item.packageName">
                                 </el-option>    
                             </el-select>
-                            <el-button type="primary" size="small" @click="appAction('stopapp')" class="m-l-10">Stop</el-button>
+                            <el-button type="primary" size="small" @click="setAppSensor('launchapp')" class="m-l-10">Launch</el-button>
                         </el-form-item>
-                        <el-form-item label="Disable App:">
-                            <el-select v-model="form.disableapp" placeholder="Please select app" class="w-300" size="small">
+                        <el-form-item label="Stop App:">
+                            <el-select v-model="stopapp" placeholder="Please select app" class="w-300" size="small">
                                 <el-option
                                     v-for="item in appOptions"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
+                                    :key="item.packageName"
+                                    :label="item.appName"
+                                    :value="item.packageName">
                                 </el-option>    
                             </el-select>
-                            <el-button type="primary" size="small" @click="appAction('disableapp')" class="m-l-10">Disable</el-button>
+                            <el-button type="primary" size="small" @click="setAppSensor('stopapp')" class="m-l-10">Stop</el-button>
                         </el-form-item>
                         <el-form-item label="Enable App:">
-                            <el-select v-model="form.enableapp" placeholder="Please select app" class="w-300" size="small">
+                            <el-select v-model="enableapp" placeholder="Please select app" class="w-300" size="small">
                                 <el-option
                                     v-for="item in appOptions"
-                                    :key="item.value"
-                                    :label="item.label"
-                                    :value="item.value">
+                                    :key="item.packageName"
+                                    :label="item.appName"
+                                    :value="item.packageName">
                                 </el-option>    
                             </el-select>
-                            <el-button type="primary" size="small" @click="appAction('enableapp')" class="m-l-10">Enable</el-button>
+                            <el-button type="primary" size="small" @click="setAppSensor('enableapp')" class="m-l-10">Enable</el-button>
                         </el-form-item>
+                        <el-form-item label="Disable App:">
+                            <el-select v-model="disableapp" placeholder="Please select app" class="w-300" size="small">
+                                <el-option
+                                    v-for="item in appOptions"
+                                    :key="item.packageName"
+                                    :label="item.appName"
+                                    :value="item.packageName">
+                                </el-option>    
+                            </el-select>
+                            <el-button type="primary" size="small" @click="setAppSensor('disableapp')" class="m-l-10">Disable</el-button>
+                        </el-form-item>
+
                     </el-form>
                 </el-tab-pane>
                 <el-tab-pane label="App Market" name="appmarket">
@@ -83,7 +84,12 @@
                             <template slot-scope="scope">
                                 <div>
                                     <span>
-                                        <el-button size="small" type="danger" @click="confirmDelete(scope.row)">Delete</el-button>
+                                        <el-button-group>
+                                            <el-button size="small" type="danger" @click="appAction('uninstallapp', scope.row)" v-if="scope.row[3] === 'uninstallapp' || scope.row[3] === 'upgradeapp'">uninstall</el-button>
+                                            <el-button size="small" type="info" @click="appAction('upgradeapp', scope.row)" v-if="scope.row[3] === 'upgradeapp' ">update</el-button>
+                                            <el-button size="small" type="primary" @click="appAction('installapp', scope.row)" v-if="scope.row[3] === 'installapp'">install</el-button>
+                                        </el-button-group>
+                                        
                                     </span>
                                 </div>
                             </template>
@@ -96,19 +102,21 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
+    import {getSensorStatusApi, setSensorStatusApi, getRepoAppsApi} from '../restfulapi/remotecontrol'
     import selectGroup from '../../common/select-group'
-    import {aimSdkPlugin, getAppInfoSensor, getRepoAppUrl, getRepoToken} from '@/assets/js/controlproperty'
-    import Chart from 'chart.js'
+    import {aimSdkPlugin, getAppInfoSensor, getRepoAppUrl, getRepoTokenUrl, appFuncSensor} from '@/assets/js/controlproperty'
+    import handleResponse from '../restfulapi/handleresponse'
 
     export default{
         name: 'controlAppcontrol',
         data(){
             return {
                 activeName: "appaction",
-                form: {
-
-                },
+                launchapp: '',
+                stopapp: '',
+                enableapp: '',
+                disableapp: '',
+                appTableData: [],
                 appOptions:[],
                 selectedAgentId: '',
                 selectedDeviceId: ''
@@ -120,31 +128,34 @@
         },
         methods:{
             getSensorStatus(){
-                AppManagementInfoArray = [];
-                let deviceapparray = [];
-                let deviceid;
-                let GetSensorsData={};
-                GetSensorsData.agentId = this.selectedAgentId;
-                GetSensorsData.plugin = aimSdkPlugin;
-                GetSensorsData.sensorId = getAppInfoSensor;
-                deviceid = this.selectedDeviceId;
-                GetSensorsData._ = Date.parse(new Date());
-                let myurl = "rmm/v1/devicectrl/"+deviceid+"/data";
-                this.apiGet(myurl, GetSensorsData).then((obj) => {
-                    this.handleResponse(obj, (res) => {
+                let AppManagementInfoArray = [];
+                let deviceAppArray = [];
+                getSensorStatusApi(this.selectedDeviceId, getAppInfoSensor, this.selectedAgentId, aimSdkPlugin).then((obj) => {
+                    handleResponse(obj, (res) => {
                         let sensorarray = res.sensorIds;
                         sensorarray.forEach(function(val){
-                            if(sensorid === aimSdkPlugin+AppFuncSensor.allappinfo){
+                            if(sensorid === aimSdkPlugin+appFuncSensor.allappinfo){
                                 let apppackageinfo = JSON.parse(val.sv);
                                 this.appOptions = apppackageinfo.data;
-                                this.getRepoApps(AppManagementInfoArray, deviceapparray);
-                            }
-                            
+                                this.appOptions.forEach(function(val){
+                                    let unInstallAppObj = {
+                                        type: 'uninstallapp',
+                                        appname: val.appName,
+                                        package: val.packageName,
+                                        versioncode: val.versionCode,
+                                        version: val,versionName
+                                    };
+                                    AppManagementInfoArray.push(unInstallAppObj);
+                                    deviceAppArray.push(unInstallAppObj);
+                                })
+                                
+                                this.getRepoApps(AppManagementInfoArray, deviceAppArray);
+                            }  
                         })  
-                    })
-                    
+                    })   
                 })
             },
+            // Deletes an object of a particular value in array
             removeObjInArray(OriginData, rem_apk_val){
                 OriginData.forEach(function(obj_val, index){
                     if(obj_val.package === rem_apk_val){
@@ -162,53 +173,50 @@
 
                 let formData = {username:"jinxin",passwd:"jinxin"};
                 let info_data;
-                this.repoApiPost(repourl, formData).then((token_data) =>{
-                    token = token_data.token;
-                    this.repoApiGet(AppInfoUrl, info_data, token).then((installappdata) => {
-                        if(installappdata.data){
-                            let installappopt = "";
-                            let upgradeappopt = "";
-                            let lastVersionCode = [];
-                            installappdata.data.forEach(function(val){
-                                let version = val.versionName != null ? val.versionName:"";
-                                InstallAppManagementInfo = {
-                                    type : "installapp", 
-                                    appname: val.filename, 
-                                    package: val.pkgname, 
-                                    versioncode: val.versioncode, 
-                                    version: val.versionname};
-                                AppManagementInfoArray.push(InstallAppManagementInfo);
-                                deviceapparray.forEach(function(deviceapp_val){
-                                    if(val.pkgname === deviceapp_val.package){
-                                        if (val.versioncode > deviceapp_val.versioncode){
-                                            // select latest version apk
-                                            if(lastVersionCode[val.pkgname] === undefined || val.versioncode > lastVersionCode[val.pkgname]){
-                                                lastVersionCode[val.pkgname] = val.versioncode;
-                                                // pop latest app info
-                                                AppManagementInfoArray.pop(); 
-                                                // remove install app push update app 
-                                                this.removeObjInArray(AppManagementInfoArray, val.pkgname);
-                                                UpgradeAppManagementInfo = {
-                                                    type : "upgradeapp", 
-                                                    appname: deviceapp_val.appname,
-                                                    upgradeapk : val.filename, 
-                                                    package: val.pkgname, 
-                                                    versioncode: val.versioncode,
-                                                    latestversion: val.versionname, 
-                                                    version: deviceapp_val.version};
-                                                AppManagementInfoArray.push(UpgradeAppManagementInfo);     
-                                            }
-                                        }else{
+                getRepoAppsApi(getRepoTokenUrl,getRepoAppUrl).then((installappdata) => {
+                    if(installappdata.data){
+                        let installappopt = "";
+                        let upgradeappopt = "";
+                        let lastVersionCode = [];
+                        installappdata.data.forEach(function(val){
+                            let version = val.versionName != null ? val.versionName:"";
+                            InstallAppManagementInfo = {
+                                type : "installapp", 
+                                appname: val.filename, 
+                                package: val.pkgname, 
+                                versioncode: val.versioncode, 
+                                version: val.versionname};
+                            AppManagementInfoArray.push(InstallAppManagementInfo);
+                            deviceAppArray.forEach(function(deviceapp_val){
+                                if(val.pkgname === deviceapp_val.package){
+                                    if (val.versioncode > deviceapp_val.versioncode){
+                                        // select latest version apk
+                                        if(lastVersionCode[val.pkgname] === undefined || val.versioncode > lastVersionCode[val.pkgname]){
+                                            lastVersionCode[val.pkgname] = val.versioncode;
+                                            // pop latest app info
                                             AppManagementInfoArray.pop(); 
+                                            // remove install app push update app 
+                                            this.removeObjInArray(AppManagementInfoArray, val.pkgname);
+                                            UpgradeAppManagementInfo = {
+                                                type : "upgradeapp", 
+                                                appname: deviceapp_val.appname,
+                                                upgradeapk : val.filename, 
+                                                package: val.pkgname, 
+                                                versioncode: val.versioncode,
+                                                latestversion: val.versionname, 
+                                                version: deviceapp_val.version};
+                                            AppManagementInfoArray.push(UpgradeAppManagementInfo);     
                                         }
-                                        
+                                    }else{
+                                        AppManagementInfoArray.pop(); 
                                     }
                                     
-                                })
+                                }
                             })
-                        }
-                        this.appTableData = AppManagementInfoArray;
-                    })
+                        })
+                    }
+                    this.appTableData = AppManagementInfoArray;
+                    
                 })
             },
 	
@@ -224,14 +232,7 @@
                     })
                     .then(function(willfunc){
                         if (willfunc) {
-                            $("#page_loading").show();
-                            let setsensordata = {};
-                            setsensorid = AppFuncSensor[cid]; 
-                            setsensordata.agentId = this.selectedAgentId;
-                            setsensordata.plugin = aimSdkPlugin;
-                            setsensordata.sensorIds = [];
-                            setsensordata.sensorIds[0]={"n":setsensorid, "sv":setsensorval};
-                            this.apiPost("rmm/v1/devicectrl/data",setsensordata).then((data) => {
+                            setSensorStatusApi(cid, AppFuncSensor[cid], this.selectedAgentId, aimSdkPlugin).then((data) => {
                                 handleResponse(data, (res) => {
                                     $("#page_loading").hide();
                                     if(data.items[0].statusCode == "200"){
@@ -245,14 +246,8 @@
                         }
                     })
                 }else{
-                    let setsensordata = {};
-                    setsensorid = AppFuncSensor[cid]; 
-                    setsensordata.agentId = this.selectedAgentId;
-                    setsensordata.plugin = cid === "stopapp" ? DroidRoot : aimSdkPlugin;
-                    setsensordata.sensorIds = [];
-                    setsensordata.sensorIds[0]={"n":setsensorid, "sv":setsensorval};
-                    $("#page_loading").show();
-                    apipost("rmm/v1/devicectrl/data",setsensordata).then((data) => {
+                    let plugin = cid === "stopapp" ? DroidRoot : aimSdkPlugin;
+                    setSensorStatusApi(AppFuncSensor[cid], setsensorval, this.selectedAgentId, plugin).then((data) => {
                         handleResponse(data, (res) => {
                             $("#page_loading").hide();
                             if(data.items[0].statusCode == "200"){
@@ -290,8 +285,6 @@
         mounted(){
 
         },
-
-        mixins:[http]
 
     }
 </script>
