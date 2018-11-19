@@ -271,7 +271,7 @@
         computed: {
             msgCount: {
                 get(){
-                    return this.msgData.length
+                    return this.msgData.length> 0? this.msgData.length: '';
                 },
                 set(val){
                     this.msgCount = val;

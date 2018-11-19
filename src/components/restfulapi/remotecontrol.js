@@ -4,7 +4,7 @@ import {apiGet, apiPost, apiPut, repoApiGet, repoApiPost} from "../../assets/js/
 
 let getSensorStatusApi = function(did, sensorId, agentId, plugin){
     return new Promise((resolve, reject) => {
-        let GetSensorsData= {
+        let getSensorsData= {
             agentId: agentId,
             plugin: plugin,
             sensorId: sensorId,
@@ -12,30 +12,39 @@ let getSensorStatusApi = function(did, sensorId, agentId, plugin){
         };
         
         let myurl = "rmm/v1/devicectrl/"+did+"/data";
-        apiGet(myurl, GetSensorsData).then((obj) => {
+        apiGet(myurl, getSensorsData).then((data) => {
             resolve(data);
         }).catch((error) => {
-            resolve(err.response);
+            resolve(error.response);
         })
     })
 }
 
 let setSensorStatusApi = function(setSensorId, setsensorval, selectedAgentId, plugin){
     return new Promise((resolve, reject) => {
+        let sensorIds;
+        if(typeof(setsensorval) === "string"){
+            sensorIds={
+                n: setSensorId, 
+                sv: setsensorval
+            }
+        }else{
+            sensorIds={
+                n: setSensorId, 
+                bv: setsensorval
+            }
+        }
         let setsensordata = {
             agentId: selectedAgentId,
             plugin: plugin,
             sensorIds: [
-                {
-                    n: setSensorId, 
-                    sv: setsensorval
-                }
+                sensorIds
             ],
         };
         apiPost("rmm/v1/devicectrl/data",setsensordata).then((data) => {
             resolve(data);
         }).catch((error) => {
-            resolve(err.response);
+            resolve(error.response);
         })
     })
 }
@@ -43,16 +52,18 @@ let setSensorStatusApi = function(setSensorId, setsensorval, selectedAgentId, pl
 let getRepoAppsApi = function(repoUrl, appInfoUrl){
     return new Promise((resolve, reject) => {
 
-        let AppInfoUrl = getRepoAppUrl;
-        let repourl = getRepoToken;
         let formData = {username:"jinxin",passwd:"jinxin"};
-        let info_data;
-        repoApiPost(repourl, formData).then((token_data) =>{
-            let token = token_data.token;
-            repoApiGet(AppInfoUrl, info_data, token).then((data) => {
+        let infoData;
+        repoApiPost(repoUrl, formData).then((tokenData) =>{
+            if(tokenData === undefined){
+                throw new Error("token is null");
+                return false;
+            }
+            let token = tokenData.data.token;
+            repoApiGet(appInfoUrl, infoData, token).then((data) => {
                 resolve(data);
             }).catch((error) => {
-                resolve(err.response);
+                resolve(error.response);
             })
         })
     })

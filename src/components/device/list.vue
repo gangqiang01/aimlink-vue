@@ -55,9 +55,8 @@
                 label="Status"
                 min-width="120">
                     <template slot-scope="scope">
-                        <i v-bind:class="[isconnect? online: offline]"></i>
-                        <span v-if="isconnect">online</span>
-                        <span v-else>offline</span>
+                        <i v-bind:class="[scope.row.connected? online: offline]"></i>
+                        <span >{{scope.row.connected? 'online': 'offline'}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -109,8 +108,8 @@
                 deviceTableData:[],
                 deviceList:[],
                 isconnect: false,
-                online: "fa fa-child c-green",
-                offline: 'fa fa-minus-circle c-danger',
+                online: "fa fa-child fa-x c-success",
+                offline: 'fa fa-minus-circle fa-x c-danger',
                 multipleTable:[],
                 limit: 10,
                 dataCount: null,

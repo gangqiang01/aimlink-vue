@@ -26,9 +26,13 @@
         name: 'controlMonitor',
         data(){
             return {
-                deviceMonitorTimer: undefined,
+                deviceMonitorTimer: null,
                 deviceId:'',
-                selectedAgentId:''
+                selectedAgentId:'',
+                cpudata: new Array(7),
+                memorydata: new Array(7),
+                memoryNowPercentage: 0,
+                cpuNowPercentage: 0
             }
         },
         components:{
@@ -59,13 +63,14 @@
                 return options;
             },
             startDeviceMonitor(selectedAgentId, deviceId){
-                if(this.deviceMonitorTimer == undefined){
+                if(this.deviceMonitorTimer == null){
                     startIntermittentApi(selectedAgentId, systemMonitorPlugin).then((data) => {
                         handleResponse(data, (res) =>{
                             if(res.result = true){
-                                this.deviceMonitor();
-                                this.deviceMonitorTimer = window.setInterval(function(){
-                                    deviceMonitor(selectedAgentId, deviceId)
+                                console.log(this);
+                                this.deviceMonitor(selectedAgentId, deviceId);
+                                this.deviceMonitorTimer = window.setInterval(() => {
+                                    this.deviceMonitor(selectedAgentId, deviceId)
                                 },3000)
                             }else{
                                 console.log("inetervalreport error")
@@ -76,7 +81,7 @@
                 }
             },
             deviceMonitor(selectedAgentId, deviceId){
-                let cpuNowPercentage, MemoryNowPercentage;
+                let cpuNowPercentage, memoryNowPercentage;
                 getDeviceStatusApi(deviceId, selectedAgentId, systemMonitorPlugin).then((data) =>{
                     handleResponse(data, (res)=>{
                         if(res.connected == false){
@@ -95,32 +100,29 @@
                         }
                         cpuNowPercentage = res.ProcessMonitor["System Monitor Info"]["e"][0].v;
                         let ToMemoryData = res.ProcessMonitor["System Monitor Info"]["e"][1].v
-                        let NewMemoryData = ToMemoryData-data.ProcessMonitor["System Monitor Info"]["e"][2].v;
-                        MemoryNowPercentage = parseInt(NewMemoryData/ToMemoryData*100);
-                        cpudata.push(cpuNowPercentage);
-                        cpudata.shift();
-                        memorydata.push(MemoryNowPercentage);
-                        memorydata.shift();
-                        this.drawCpuChart(cpudata,cpuNowPercentage)
-                        this.drawMemoryChart(memorydata, MemoryNowPercentage)
+                        let NewMemoryData = res.ProcessMonitor["System Monitor Info"]["e"][2].v;
+                        this.memoryNowPercentage = parseInt(NewMemoryData/ToMemoryData*100);
+                        this.cpudata.push(cpuNowPercentage);
+                        this.cpudata.shift();
+                        this.memorydata.push(this.memoryNowPercentage);
+                        this.memorydata.shift();
+                        this.drawCpuChart()
+                        this.drawMemoryChart()
                     })
                     
                    
                 })
             },
 
-            drawCpuChart(cpudata, cpuNowPercentage){
+            drawCpuChart(){
                 let labelOptions = this.getTimeOptions();
-                if(cpuNowPercentage == undefined){
-                    cpuNowPercentage = 0;
-                }
                 let ctx = document.getElementById("cpuchart").getContext('2d');
                 let chart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         datasets: [{
-                            label: 'CPU Usage('+cpuNowPercentage+'%)',
-                            data: cpudata,
+                            label: 'CPU Usage('+this.cpuNowPercentage+'%)',
+                            data: this.cpudata,
                             backgroundColor: "transparent",
                             borderColor : "rgba(51,122,183,0.5)",
                         }],
@@ -150,18 +152,16 @@
                 });
             },
 
-            drawMemoryChart(memorydata, MemoryNowPercentage){
-                if(MemoryNowPercentage == undefined){
-                    MemoryNowPercentage = 0;
-                }
+            drawMemoryChart(){
+
                 let labelOptions = this.getTimeOptions();
                 let ctx = document.getElementById("memorychart").getContext('2d');
                 let chart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         datasets: [{
-                            label: 'Memory Usage('+ MemoryNowPercentage+'%)',
-                            data: memorydata,
+                            label: 'Memory Usage('+ this.memoryNowPercentage+'%)',
+                            data: this.memorydata,
                             backgroundColor: "transparent",
                             borderColor : "rgba(45,213,179,0.5)",
                         }],
@@ -193,7 +193,7 @@
             },
 
             getDeviceOption(msg){
-                this.startDeviceMonitor( msg.key, msg.value);
+                this.startDeviceMonitor( msg.value, msg.key);
             }
         },
 
@@ -201,6 +201,11 @@
             this.drawCpuChart(this.cpudata)
             this.drawMemoryChart(this.memorydata)
         },
+
+        beforeDestroy() {
+            window.clearInterval(this.deviceMonitorTimer);        
+            this.deviceMonitorTimer = null;
+        }
     }
 </script>
 

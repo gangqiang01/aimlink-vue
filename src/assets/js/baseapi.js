@@ -62,23 +62,22 @@
     }
 
     //repoapi
-    let repoApiGet = function(myurl, object, token){
-        let array = [];
-        let url;
+    let repoApiGet = function(myUrl, object, token){
+        let array = [], getUrl;
         if(object != undefined){
             for(key in object){
                 array.push(key+"="+object[key]);
             }
             let parameter = array.join("&")
-            geturl = myurl+ "?" + parameter;
+            getUrl = myUrl+ "?" + parameter;
         }else{
-            geturl = myurl;
+            getUrl = myUrl;
         }
     
-        geturl = encodeURI(myurl);
+        getUrl = encodeURI(getUrl);
         return new Promise((resolve, reject) => {
             axios.defaults.headers['accesstoken'] = token;
-            axios.get(geturl).then((response) => {
+            axios.get(getUrl).then((response) => {
                 resolve(response)
             }).catch((err) => {
                 resolve(err.response)
@@ -87,8 +86,11 @@
     }
     
     let repoApiPost = function(url, data){
+        let formdata = new FormData();
+        formdata.append("username",data.username);
+        formdata.append("passwd", data.passwd);
         return new Promise(function(resolve, reject){
-            axios.post(url, data).then((response) => {
+            axios.post(url, formdata).then((response) => {
                 resolve(response)
             }).catch((err) => {
                 resolve(err.response)

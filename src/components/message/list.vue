@@ -71,8 +71,14 @@
                 </el-table-column>
                 <el-table-column
                 label="Severify"
-                prop="severity"
                 min-width="120">
+                    <template slot-scope="scope">
+                        <div>
+                            <span style="padding: 5px; border-radius: 3px; border-radius: 5px" :class="[scope.row.severity =='Error'? 'bg-red': scope.row.severity == 'Warning'? 'bg-yellow' :'bg-green']">
+                                {{scope.row.severity}}
+                            </span>
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column
                 label="Subtype"
@@ -121,7 +127,9 @@
 </template>
 
 <script>
-    import http from '@/assets/js/http'
+    import {getDeviceGroupApi} from '../restfulapi/devicegroupapi'
+    import {getDeviceCategoryApi, getEventMsgApi} from '../restfulapi/msgapi'
+    import handleResponse from '../restfulapi/handleresponse'
     import btnGroup from '@/common/btn-group'
     export default{
         name: 'messageList',
@@ -152,44 +160,30 @@
 
         methods:{
             getDeviceGroup(){
-                let devGetData = {};
-                devGetData.pageSize = 1000;
-                devGetData.no = 1;
-                devGetData.orderType = "aid";
-                devGetData.like = "";
-                devGetData._ = new Date().getTime();
-                this.apiGet('rmm/v1/accounts', devGetData).then((data) => {
-                    this.handleResponse(data, (res) => {
-                        let accountId = res.accounts[0].aid
-                        let groupGetData = {};
-                        groupGetData._ = new Date().getTime();
-                        this.apiGet("rmm/v1/accounts/"+accountId+"/groups", groupGetData).then((data) => {
-                            this.handleResponse(data, (res) => {
-                                let groupData = res.accounts[0].groups
-                                console.log(groupData)
-                                if(groupData.length != 0){
-                                    let groupOptionsData = [];
-                                    groupData.forEach(function(val){
-                                        groupOptionsData.push({value: val.gid, label:val.name})
-                                    }) 
-                                    this.groupValue = groupData[0].gid;
-                                    this.groupOptions = groupOptionsData
-                                }else{
-                                    this.groupOptions = [];
-                                }
-                            })
+                getDeviceGroupApi().then((data) => {
+                    handleResponse(data, (res) => {
+                        let groupData = res.accounts[0].groups
+                        console.log(groupData)
+                        if(groupData.length != 0){
+                            let groupOptionsData = [];
+                            groupData.forEach(function(val){
+                                groupOptionsData.push({value: val.gid, label:val.name})
+                            }) 
+                            this.groupValue = groupData[0].gid;
+                            this.groupOptions = groupOptionsData
+                        }else{
+                            this.groupOptions = [];
+                        }
+                        this.$nextTick(function () {
+                            this.getEventMessages();
                         })
                     })
-                    
                 })
             },
 
             getDeviceCategory(){
-                var categoryData = {};
-                categoryData.type = "Device";
-                categoryData._ = new Date().getTime();
-                this.apiGet("rmm/v1/notifymgmt/category", categoryData).then((data) => {
-                    this.handleResponse(data, (res)=> {
+                getDeviceCategoryApi().then((data) => {
+                    handleResponse(data, (res)=> {
                         if(!data.result){
                             let catopts=[];
                             res.result.forEach(function(catObj){
@@ -200,6 +194,9 @@
                         }else{
                             this.categoryOptions = [];
                         }
+                        this.$nextTick(function () {
+                            this.getEventMessages();
+                        })
                     })
                    
                 })
@@ -214,8 +211,8 @@
                     dangerMode:true,
                 }).then((willDelete) => {
                     if(willDelete){
-                        this.apiDelete('rmm/v1/devicegroups/'+row.gid).then((data) => {
-                            this.handleResponse(data, (res) => {
+                       DeleteMsgApi(row.id).then((data) => {
+                            handleResponse(data, (res) => {
                                 if(res.result){
                                     swal("","Delete Message successfully",'success').then(() => {
                                         getEventMessages();
@@ -239,20 +236,11 @@
             },
 
             getEventMessages(){
-
-                var eventMsgData = {};
-                eventMsgData.severity = this.severityValue;
-                eventMsgData.groupId = this.groupValue;
-                eventMsgData.beginTs = _g.getFromNowTimes(7, 0);
-                eventMsgData.endTs =  _g.getFromNowTimes(0, 0);
-                eventMsgData.orderType = "desc";
-                if(this.categoryValue != "all"){
-                    eventMsgData.category =  this.categoryValue;
+                if(this.severityValue == '' || this.groupValue == '' || this.categoryValue == ''){
+                    return;
                 }
-                eventMsgData.amount = 20;
-                eventMsgData._ = new Date().getTime();
-                this.apiGet("rmm/v1/events/devices", eventMsgData).then((data) => {
-                    this.handleResponse(data, (res) =>{
+                getEventMsgApi(this.severityValue, this.groupValue, this.categoryValue).then((data) => {
+                    handleResponse(data, (res) =>{
                         this.msgTableData = res.events;
                         this.dataCount = this.msgTableData.length;
                         this.messageList = this.msgTableData.slice(0,this.limit)
@@ -263,14 +251,10 @@
                 
             },
         },
-
         created(){
             this.getDeviceGroup();
             this.getDeviceCategory();
-            this.getEventMessages();
         },
-
-        mixins:[http]
     }
 </script>
 <style lang='scss' scoped>

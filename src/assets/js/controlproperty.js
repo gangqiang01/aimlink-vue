@@ -3,6 +3,7 @@ const aimSdkPlugin = "AimSdk";
 const getRepoAppUrl =  "http://172.21.73.109:30001/vuethink/php/index.php/admin/Restrepo/getapkinfo/reponame/aim-market";
 const getRepoTokenUrl = "http://172.21.73.109:30001/vuethink/php/index.php/admin/Restrepo/gettoken";
 const repoAppBaseDownloadUrl = "http://172.21.73.109:30002"
+const droidRoot = "DroidRoot"
 const settingsStatusSensor = {
     wifi: "/devicectrl/ctrl-wifi",
     bluetooth: "/devicectrl/ctrl-bluetooth",
@@ -37,7 +38,8 @@ export {
     settingsStatusSensor,
     getAppInfoSensor,
     appFuncSensor,
-    disableAppArray
+    disableAppArray,
+    droidRoot
 }
 
 

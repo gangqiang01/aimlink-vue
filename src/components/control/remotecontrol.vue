@@ -128,19 +128,19 @@
 <script>
     import {getSensorStatusApi, setSensorStatusApi, powerActionApi } from '../restfulapi/remotecontrol'
     import selectGroup from '../../common/select-group'
-    import {aimSdkPlugin, getAppInfoSensor, getRepoAppUrl, getRepoToken} from '@/assets/js/controlproperty'
+    import {aimSdkPlugin, getAppInfoSensor, getRepoAppUrl, getRepoToken, settingsStatusSensor} from '@/assets/js/controlproperty'
     import handleResponse from '../restfulapi/handleresponse'
 
     export default{
         name: 'controlRemotecontrol',
         data(){
             return {
-                wifi: true,
-                bluetooth: true,
-                gps: true,
-                lockscreen: true,
-                homekey: true,
-                backkey: true,
+                wifi: false,
+                bluetooth: false,
+                gps: false,
+                lockscreen: false,
+                homekey: false,
+                backkey: false,
                 selectedAgentId:'',
                 selectedDeviceId:'',
             }
@@ -152,17 +152,28 @@
             getSensorStatus(){
                 let AppManagementInfoArray = [];
                 let deviceapparray = [];
-                getSensorStatusApi(this.selectedDeviceId, getAppInfoSensor, this.selectedAgentId, aimSdkPlugin).then((obj) => {
-                    this.handleResponse(obj, (res) => {
+                let sensorIds = '';
+                for(let key in settingsStatusSensor){
+                    sensorIds+=settingsStatusSensor[key]+"|";
+                }
+                console.log(this);
+                getSensorStatusApi(this.selectedDeviceId, sensorIds, this.selectedAgentId, aimSdkPlugin).then((obj) => {
+                    handleResponse(obj, (res) => {
                         let sensorarray = res.sensorIds;
-                        sensorarray.forEach(function(val){
+                        sensorarray.forEach((val) => {
                             let sensorid = val.sensorId;
                             for(let sensor_key in settingsStatusSensor){
                                 if(sensorid == aimSdkPlugin+settingsStatusSensor[sensor_key] ){
                                     if(val.bv != undefined){
-                                        this.sensor_key = val.bv;
+                                        if(typeof(val.bv) === "Boolean"){
+                                            this[sensor_key] = val.bv;
+                                        }else{
+                                            this[sensor_key] = val.bv == "true"? true: false;
+                                        }
+                                        
+                                    }else{
+                                        this[sensor_key] = val.sv;
                                     }
-
                                 
                                 }
                             }
@@ -172,21 +183,21 @@
                     
                 })
             },
-           switchChange(setsensorval, cid){
+           switchChange(setSensorVal, cid){
 
-                let setsensorid = this.cid;
-                if(this.electedAgentId == ''){
-                    swal("","Please select your device","info").then(function(){
-                        this.cid = true;
+                let setSensorId = settingsStatusSensor[cid];
+                if(this.selectedAgentId == ''){
+                    swal("","Please select your device","info").then(() => {
+                        this[cid] = !this[cid];
                     })
                     return;
                 }
-                setSensorStatusApi(setSensorId, setsensorval, this.selectedAgentId, AimSdkPlugin).then((data) => {
+                setSensorStatusApi(setSensorId, setSensorVal, this.selectedAgentId, aimSdkPlugin).then((data) => {
                     handleResponse(data, (res) =>{
                         if(res.items[0].statusCode == "200"){
                             swal("","success","success");
                         }else{
-                            this.cid = !setsensorval;
+                            this[cid] = !setSensorVal;
                         }
                     })
                     
@@ -203,8 +214,7 @@
                     icon: "warning",
                     buttons: true,
                     dangerMode: true,
-                })
-                .then(function(willfunc){
+                }).then(function(willfunc){
                     if (willfunc) {
                         powerActionApi(cid, this.selectedDeviceId).then((data) => {
                             handleResponse(data, (res) => {
@@ -219,13 +229,10 @@
             },
 
             getDeviceOption(msg){
-                this.selectedAgentId = msg.label;
+                this.selectedAgentId = msg.value;
                 this.selectedDeviceId = msg.key;
+                this.getSensorStatus();
             }
-        },
-
-        mounted(){
-
         },
 
     }

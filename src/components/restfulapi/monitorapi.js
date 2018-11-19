@@ -5,7 +5,7 @@ let startIntermittentApi = function(selectedAgentId, plugin){
     return new Promise((resolve, reject) => {
         let intervalReportData = {
             agentid: selectedAgentId,
-            plugin: plubin,
+            plugin: plugin,
             interval: 1,
             timeout: 60,
         };
@@ -13,7 +13,7 @@ let startIntermittentApi = function(selectedAgentId, plugin){
         apiPut("rmm/v1/devicectrl/intermittent_report", intervalReportData).then((data) => {
             resolve(data);
         }).catch((error) => {
-            resolve(err.response);
+            resolve(error.response);
         })
     })
 }
@@ -29,7 +29,7 @@ let getDeviceStatusApi = function(did, selectedAgentId, plugin){
         apiGet(myurl, GetSystemMonitorData).then((data) =>{
             resolve(data);
         }).catch((error) => {
-            resolve(err.response);
+            resolve(error.response);
         })
     })
 }

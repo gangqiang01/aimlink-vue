@@ -22,7 +22,7 @@
                     <el-form-item label="Group Name:">
                         <span>{{ props.row.name }}</span>
                     </el-form-item>
-                    <el-form-item label="Offline Devices Count:">
+                    <el-form-item label="Devices Count:">
                         <span>{{ props.row.numOfDevices }}</span>
                     </el-form-item>
                     <el-form-item label="Group Description:">

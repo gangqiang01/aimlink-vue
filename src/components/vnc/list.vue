@@ -81,7 +81,7 @@
                         level = "warn";
                 }
                 if(text == "Connecting"){
-                    document.getElementById("VNC_enter").innerHTML='<img src="assets/img/connect_vnc.gif" alt="loading">';
+                    document.getElementById("VNC_enter").innerHTML='<img src="../../assets/img/connect_vnc.gif" alt="loading">';
                     document.getElementById("VNC_closed").style.display = "none"
                 }else if(text == "Disconnected"){
                     document.getElementById("VNC_closed").style.display = "none"
@@ -124,9 +124,9 @@
                     WebUtil.createCookie('token', token, 1)
                 }
 
-                status("Connecting", "normal");
+                this.status("Connecting", "normal");
                 if ((!host) || (!port)) {
-                    status('Must specify host and port in URL', 'error');
+                    this.status('Must specify host and port in URL', 'error');
                 }
 
                 var url  = 'wss';

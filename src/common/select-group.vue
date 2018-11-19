@@ -24,7 +24,6 @@
                     <el-option 
                         v-for="item in devicegroup.options"
                         :key="item.value"
-                        class="[devicegroup.label=='online'?'c-green':'']"
                         :label="item.label"
                         :value="item.value"
                         :disabled="item.disabled">
@@ -90,10 +89,8 @@
                                 }
                                 
                             }) 
-                            // this.devValue = deviceData[0].name;
                             this.deviceOptions = deviceOptionsData;
                             let value = this.devValue;
-                            this.deviceChange(value);
                         }else{
                             this.deviceOptions = [];
                         }
@@ -102,12 +99,15 @@
             },
 
             deviceChange(val){
-                let selectedDeviceObj = {};
+                let selectedDeviceObj;
                 this.deviceOptions.forEach((deviceOptions) =>{
-                    selectedDeviceObj =deviceOptions.options.find((item)=>{
-                        return item.value === val;
-                    });
+                   deviceOptions.options.forEach((value, index)=>{
+                       if(value.value == val){
+                           selectedDeviceObj = value; 
+                       }
+                   })
                 })
+
                 this.$emit("select-device",selectedDeviceObj)
             }
 
@@ -117,3 +117,7 @@
         },
     }
 </script>
+<style lang='scss' scoped>
+
+</style>
+
