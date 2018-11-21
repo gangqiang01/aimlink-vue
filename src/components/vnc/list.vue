@@ -6,28 +6,38 @@
         </el-col>
         <el-col :span="18" class="m-t-20">
             <div id="noVNC_content">
-                <i class="fa fa-times fa-x pointer" style="display:none" @click="disconnectVNC" ></i>
-                <div id="noVNC_status_bar">
+                <i class="fa fa-times fa-x pointer" @click="disconnectVNC" id="VNC_closed" v-show="isShowClosed" ></i>
+                <div id="noVNC_status_bar" :class="['noVNC_status_' + level]">
                     <div id="noVNC_left_dummy_elem"></div>
-                    <div id="noVNC_status"></div>
-
-                    <div id="VNC_enter">
-                        <h2 class="VNC_title">VNC To Your Device</h2>
-                        <el-button type="primary"  @click="startVNC">
-                            <i class="fa fa-link"></i> Connect
-                        </el-button>
+                    <div id="noVNC_status">
+                        {{VNCStatus}}
                     </div>
+
+                    <div id="VNC_enter" >
+                        <div v-show="connectStatus === 'disconnect'">
+                            <h2 class="VNC_title">VNC To Your Device</h2>
+                            <el-button type="primary"  @click="getVNCpropertys()">
+                                <i class="fa fa-link"></i> Connect
+                            </el-button>
+                        </div>
+                        <div v-show="connectStatus === 'connecting'">
+                            <img src="@/assets/imgs/connect_vnc.gif" alt="no img">
+                        </div>
+                        <div v-show="connectStatus === 'connected'"></div>
+                    </div>
+
                 </div>
             </div>
         </el-col>
    </div>
 </template>
 <script>
-    import http from '@/assets/js/http'
+    import {getVNCPropertysApi} from '../restfulapi/vncapi'
+    import handleResponse from '../restfulapi/handleresponse'
     import selectGroup from '../../common/select-group'
-    import * as WebUtil from '@/thirdpackage/noVNC/app/webutil.js';
-    import RFB from '@/thirdpackage/noVNC/core/rfb.js';
-
+    import * as WebUtil from '../../../static/noVNC/app/webutil.js';
+    import RFB from '../../../static/noVNC/core/rfb.js';
+    
     export default{
         name: 'vncList',
         data(){
@@ -35,6 +45,13 @@
                 selectedAgentId: '',
                 selectedDeviceId: '',
                 rfb: null,
+                vncMode: 3,
+                repeaterID: 0,
+                desktopName:'',
+                connectStatus: "disconnect",
+                isShowClosed: false,
+                level: '',
+                VNCStatus: ''
             }
         },
         components:{
@@ -46,14 +63,20 @@
                     this.rfb._sock.close()
                 };
             },
-
+            setRepeaterId(){
+                this.repeaterID = Math.floor(Math.random()*9000)+1000;
+            },
             getVNCpropertys(){
                 if(!this.selectedAgentId){
                     swal("","Please select your device","info")
                     return;
                 }
-               getVNCPropertysApi(this.selectedAgentId).then((data) =>{
+               getVNCPropertysApi(this.selectedAgentId, this.vncMode, this.repeaterID).then((data) =>{
                     handleResponse(data, (res) => {
+                        if(res.port === undefined){
+                            swal("", " Connect failed. Try again", "info")
+                            return;
+                        }
                         this.startVNC(res.IP, res.port, res.password, "");
                     })
                     
@@ -61,52 +84,54 @@
             },
 
             updateDesktopName(e) {
-                desktopName = e.detail.name;
+                this.desktopName = e.detail.name;
             },
 
 
-            status(text, level) {
+            status(text, level, type) {
                 var vncContentMsg = ` <h2 class="VNC_title">VNC To Your Device</h2>
                     <el-button type="primary"  @click="startVNC">
                         <i class="fa fa-link"></i> Connect
                     </el-button>`;
                 switch (level) {
                     case 'normal':
-                    case 'warn':
-                    case 'error':{
-                        document.getElementById("VNC_enter").innerHTML=vncContentMsg;
                         break;
-                    }
+                    case 'warn':
+                        break;
+                    case 'error':
+                        type = "Disconnect";
+                        break;
+                    
                     default:
-                        level = "warn";
+                        this.level = "warn";
                 }
-                if(text == "Connecting"){
-                    document.getElementById("VNC_enter").innerHTML='<img src="../../assets/img/connect_vnc.gif" alt="loading">';
-                    document.getElementById("VNC_closed").style.display = "none"
-                }else if(text == "Disconnected"){
-                    document.getElementById("VNC_closed").style.display = "none"
-                    document.getElementById("VNC_enter").innerHTML=vncContentMsg;
+                if(type == "connecting"){
+                    this.isShowClosed = false;
+                    this.connectStatus = "connecting";
+                }else if(type == "disconnect"){
+                    this.isShowClosed = false;
+                    this.connectStatus = "disconnect"
                 }else{
-                    document.getElementById("VNC_enter").innerHTML='';
-                    document.getElementById("VNC_closed").style.display = ""
+                    this.isShowClosed = "true";
+                    this.connectStatus="connected"
                 }
-                document.getElementById('noVNC_status_bar').className = "noVNC_status_" + level;
-                document.getElementById('noVNC_status').textContent = text;
+                this.level = level;
+                this.VNCStatus = text;
             },
 
             connected(e) {
                 if (WebUtil.getConfigVar('encrypt',true)) {
-                    this.status("Connected (encrypted) to " + desktopName, "normal");
+                    this.status("Connected (encrypted) to " + this.desktopName, "normal", "connected");
                 } else {
-                    this.status("Connected (unencrypted) to " + desktopName, "normal");
+                    this.status("Connected (unencrypted) to " + this.desktopName, "normal", "connected");
                 }
             },
 
             disconnected(e) {
                 if (e.detail.clean) {
-                    this.status("Disconnected", "normal");
+                    this.status("disconnect", "normal", "disconnect");
                 } else {
-                    this.status("Something went wrong, connection is closed", "error");
+                    this.status("Something went wrong, connection is closed", "error", "error");
                 }
             },
 
@@ -124,9 +149,9 @@
                     WebUtil.createCookie('token', token, 1)
                 }
 
-                this.status("Connecting", "normal");
+                this.status("connecting", "normal", "connecting");
                 if ((!host) || (!port)) {
-                    this.status('Must specify host and port in URL', 'error');
+                    this.status('Must specify host and port in URL', 'error', "error");
                 }
 
                 var url  = 'wss';
@@ -138,7 +163,7 @@
                 url += '/' + path;
 
                 this.rfb = new RFB(document.getElementById('noVNC_content'), url,
-                            { repeaterID: repeaterId,
+                            { repeaterID: this.repeaterID,
                                 shared: true,
                                 credentials: { password: password } });
                 this.rfb.viewOnly = WebUtil.getConfigVar('view_only', false);
@@ -149,16 +174,15 @@
                 this.rfb.resizeSession = WebUtil.getConfigVar('resize', false);
             },
             getDeviceOption(msg){
-                this.selectedAgentId = msg.label;
+                this.selectedAgentId = msg.value;
                 this.selectedDeviceId = msg.key;
                 this.disconnectVNC();
             }
 
         },
         created(){
-
-        },
-        mixins:[http]
+            this.setRepeaterId();
+        }
 
     }
 </script>
@@ -174,7 +198,7 @@
     position: absolute;
     color:#d3104b;
     padding:5px;
-    right:3px;
+    right:1px;
     top:-4px;
     cursor: pointer;
 }

@@ -18,7 +18,7 @@ let getDeviceCategoryApi = function(){
     }) 
 }
 
-let DeleteMsgApi = function(gid){ 
+let deleteMsgApi = function(gid){ 
     return new Promise((resolve, reject) => {
         apiDelete('rmm/v1/devicegroups/'+gid).then((data) => {
             resolve(data);
@@ -57,6 +57,6 @@ let getEventMsgApi = function(severityValue, groupValue, categoryValue){
 
 export {
     getDeviceCategoryApi,
-    DeleteMsgApi,
+    deleteMsgApi,
     getEventMsgApi
 };

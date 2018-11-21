@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div class="subWrapper">
         <p class="header-line"><i class="fa fa-android c-blue m-r-10" ></i>App Control</p>
         <el-col :span="6">
             <select-group @select-device="getDeviceOption"></select-group>
         </el-col>
-        <el-col :span="18" class="m-t-20">
+        <el-col :span="18" class="m-t-20" >
             <el-tabs v-model="activeName">
                 <el-tab-pane label="App Action" name="appaction">
                     <el-form  label-width="150px" class="m-t-20 m-l-30">
@@ -17,7 +17,14 @@
                                     :value="item.packageName">
                                 </el-option>    
                             </el-select>
-                            <el-button type="primary" size="small" @click="setAppSensor('startapp', startapp)" class="m-l-10">Launch</el-button>
+                            <el-button 
+                            type="primary"
+                            size="small"
+                            @click="setAppSensor('startapp', startapp)"
+                            class="m-l-10"
+                            v-loading="loadingstartapp">
+                                Launch
+                            </el-button>
                         </el-form-item>
                         <el-form-item label="Stop App:">
                             <el-select v-model="stopapp" placeholder="Please select app" class="w-300" size="small">
@@ -28,7 +35,14 @@
                                     :value="item.packageName">
                                 </el-option>    
                             </el-select>
-                            <el-button type="primary" size="small" @click="setAppSensor('stopapp', stopapp)" class="m-l-10">Stop</el-button>
+                            <el-button 
+                            type="primary"
+                            size="small"
+                            @click="setAppSensor('stopapp', stopapp)"
+                            class="m-l-10"
+                            v-loading="loadingstopapp">
+                                Stop
+                            </el-button>
                         </el-form-item>
                         <el-form-item label="Enable App:">
                             <el-select v-model="enableapp" placeholder="Please select app" class="w-300" size="small">
@@ -39,7 +53,14 @@
                                     :value="item.packageName">
                                 </el-option>    
                             </el-select>
-                            <el-button type="primary" size="small" @click="setAppSensor('enableapp', enableapp)" class="m-l-10">Enable</el-button>
+                            <el-button 
+                            type="primary" 
+                            size="small" 
+                            @click="setAppSensor('enableapp', enableapp)" 
+                            class="m-l-10" 
+                            v-loading="loadingenableapp">
+                                Enable
+                            </el-button>
                         </el-form-item>
                         <el-form-item label="Disable App:">
                             <el-select v-model="disableapp" placeholder="Please select app" class="w-300" size="small">
@@ -54,7 +75,8 @@
                             type="primary" 
                             size="small" 
                             @click="setAppSensor('disableapp', disableapp)" 
-                            class="m-l-10">
+                            class="m-l-10"
+                            v-loading="loadingdisableapp">
                                 Disable
                             </el-button>
                         </el-form-item>
@@ -102,9 +124,10 @@
                                             <el-button 
                                             size="small" 
                                             type="danger" 
-                                            @click="appAction('uninstallapp', scope.row)"
+                                            @click="appAction('removeapp', scope.row)"
                                             v-if="scope.row.type === 'uninstallapp' || scope.row.type === 'upgradeapp'"
                                             :disabled="disableAppArray.indexOf(scope.row.package)>=0"
+                                            v-loading="loadingremoveapp"
                                             >
                                                 uninstall
                                              </el-button>
@@ -114,6 +137,7 @@
                                             @click="appAction('upgradeapp', scope.row)" 
                                             v-if="scope.row.type === 'upgradeapp' "
                                             :disabled="disableAppArray.indexOf(scope.row.package)>0"
+                                            v-loading="loadingupgradeapp"
                                             >
                                                 update
                                             </el-button>
@@ -123,6 +147,7 @@
                                             @click="appAction('installapp', scope.row)" 
                                             v-if="scope.row.type === 'installapp'"
                                             :disabled="disableAppArray.indexOf(scope.row.package)>0"
+                                            v-loading="loadinginstallapp"
                                             >
                                                 install
                                             </el-button>
@@ -155,10 +180,17 @@
                 enableapp: '',
                 disableapp: '',
                 appTableData: [],
-                appOptions:[],
+                appOptions: [],
                 selectedAgentId: '',
                 selectedDeviceId: '',
-                disableAppArray: disableAppArray
+                disableAppArray: disableAppArray,
+                loadingstartapp: false,
+                loadingstopapp: false,
+                loadingenableapp: false,
+                loadingdisableapp: false,
+                loadingupgradeapp: false,
+                loadinginstallapp: false,
+                loadingremoveapp: false
             }
         },
         components:{
@@ -274,6 +306,7 @@
                 if(cid === "removeapp" || cid === "disableapp" || cid === "installapp" || cid === "upgradeapp"){
                     _g.swalWarnDo(cid).then((willfunc) => {
                         if (willfunc) {
+                            _g.openGlobalLoading();
                             setSensorStatusApi(appFuncSensor[cid], setSensorVal, this.selectedAgentId, aimSdkPlugin).then((data) => {
                                 handleResponse(data, (res) => {
                                     if(res.items[0].statusCode == "200"){
@@ -290,6 +323,7 @@
                     })
                 }else{
                     let plugin = cid === "stopapp" ? droidRoot : aimSdkPlugin;
+                    _g.openGlobalLoading();
                     setSensorStatusApi(appFuncSensor[cid], setSensorVal, this.selectedAgentId, plugin).then((data) => {
                         handleResponse(data, (res) => {
                             if(res.items[0].statusCode == "200"){
@@ -304,19 +338,19 @@
             appAction(cid, selectedAppData){
                 let setsensorval;
                 if(cid === "installapp"){
-                    var appname= selectedAppData[0];
-                    var pkgname= selectedAppData[1];
-                    var versionname = selectedAppData[2];
+                    var appname= selectedAppData.appname;
+                    var pkgname= selectedAppData.package;
+                    var versionname = selectedAppData.version;
                     var reponame = "95cbbb6613127668fdd633b2cc006d47";
                     setsensorval = repoAppBaseDownloadUrl + "/"+ reponame +"/" + pkgname +　"/" + versionname + "/" + appname;
                 }else if(cid === "upgradeapp"){
-                    var appname= selectedAppData[4];
-                    var pkgname= selectedAppData[1];
-                    var versionname = selectedAppData[5];
+                    var appname= selectedAppData.upgradeapk;
+                    var pkgname= selectedAppData.package;
+                    var versionname = selectedAppData.latestversion;
                     var reponame = "95cbbb6613127668fdd633b2cc006d47";
                     setsensorval = repoAppBaseDownloadUrl + "/"+ reponame +"/" + pkgname +　"/" + versionname + "/" + appname;
                 }else{
-                    setsensorval = selectedAppData[1];
+                    setsensorval = selectedAppData.package;
                 }  
                 this.setAppSensor(cid, setsensorval);
             },
@@ -336,5 +370,16 @@
 </script>
 
 <style lang='scss' scoped>
+    // height: 100%;
+    // .contentView{
+    //     height: 100%;
+    //     overflow-y: scroll;
+    //     overflow-x: hidden;
 
+    // }
+
+   
+    // .contentView::-webkit-scrollbar{
+    //     display: none;
+    // }
 </style>

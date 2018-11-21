@@ -6,8 +6,8 @@
         </el-col>
         <el-col :span="18" class="m-t-20">
             <div id="terminal" style="margin: 0px; overflow: hidden;">
-                <div id="vt100">
-                    
+                <i class="fa fa-times fa-x pointer" id="Terminal_closed" style="display:none" v-show="isShowClosed" @click="disconnectTerminal" ></i>
+                <div id="vt100" v-show="isShowContent">
                     <div id="Terminal_enter">
                         <h2 class="Terminal_title">Open Your Device's Terminal</h2>
                         <el-button type="primary" id="open_terminal_button" @click="startTerminal">
@@ -15,25 +15,26 @@
                         </el-button>
                     </div>   
                 </div>
-                <i class="fa fa-times fa-x pointer" id="Terminal_closed" style="display:none" @click="disconnectTerminal" ></i>
-                <iframe src="" frameborder="0" id="terminal_iframe"></iframe>
+                <iframe :src="iframeSrc" frameborder="0" id="terminal_iframe"></iframe>
             </div>
         </el-col>
    </div>
 </template>
 
 <script>
-    import http from '@/assets/js/http'
     import selectGroup from '../../common/select-group'
-    import _terminalWebsocket from "@/thirdpackage/shellinabox/terminalSocket"
-    import uuid from '@/thirdpackage/shellinabox/uuid-random'
+    import _terminalWebsocket from "../../../static/shellinabox/terminalSocket"
+    import uuid from '../../../static/shellinabox/uuid-random'
 
     export default{
         name: 'terminalList',
         data(){
             return {
                 selectedAgentId: '',
-                selectedDeviceId: ''
+                selectedDeviceId: '',
+                iframeSrc: '',
+                isShowClosed: false,
+                isShowContent: true,
             }
         },
         components:{
@@ -41,43 +42,31 @@
         },
         methods: {
             startTerminal(){
-                if(!SelectedAgentId){
+                if(!this.selectedAgentId.length === 0){
                     swal("","Please select your device","info");
                     return;
                 }
                 var container = document.getElementById("vt100");
-                var agentid = SelectedAgentId;
+                var agentid = this.selectedAgentId;
                 var sessionid = uuid();
                 var type = "SSO";
                 var host = "portal-rmm.wise-paas.com";
                 
-                $("#vt100").hide();
-                var iframeSrcMsg=`../../thirdpackage/shellinabox/webshell.html?agentID=${agentid}&sessionID=${sessionid}&host=${host}&type=${type}`;
-                console.log($("#terminal_iframe").attr("attr"));
-                $("#terminal_iframe").attr("src",iframeSrcMsg);
-                $("#Terminal_closed").show();
+                this.isShowContent = false;
+                this.iframeSrc =  `/static/shellinabox/webshell.html?agentID=${agentid}&sessionID=${sessionid}&host=${host}&type=${type}`;
+                this.isShowClosed = true;
 
             },
 
             disconnectTerminal(){
-                var disconnectTerminalMsg = `
-                   <div id="vt100">
-                        <div id="Terminal_enter">
-                            <h2 class="Terminal_title">Open Your Device's Terminal</h2>
-                            <el-button type="primary" id="open_terminal_button" @click="startTerminal">
-                                <i class="fa fa-link"></i> Open
-                            </el-button>
-                        </div>   
-                    </div>
-                    <i class="fa fa-times fa-x pointer" id="Terminal_closed" style="display:none" @click="disconnectTerminal" ></i>
-                    <iframe src="" frameborder="0" id="terminal_iframe"></iframe>
-                `;
-                $("#terminal").html( disconnectTerminalMsg);
-                _terminalWebsocket.closeTerminal();
+                this.isShowContent = true;
+                this.isShowClosed = false;
+                this.iframeSrc = '';
+                if(this.iframeSrc.length ===0) return;
             },
 
             getDeviceOption(msg){
-                this.selectedAgentId = msg.label;
+                this.selectedAgentId = msg.value;
                 this.selectedDeviceId = msg.key;
                 this.disconnectTerminal();
             }

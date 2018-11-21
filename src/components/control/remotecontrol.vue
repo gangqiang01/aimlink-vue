@@ -156,6 +156,7 @@
                 for(let key in settingsStatusSensor){
                     sensorIds+=settingsStatusSensor[key]+"|";
                 }
+                sensorIds = sensorIds.substring(0, sensorIds.length-1);
                 console.log(this);
                 getSensorStatusApi(this.selectedDeviceId, sensorIds, this.selectedAgentId, aimSdkPlugin).then((obj) => {
                     handleResponse(obj, (res) => {
@@ -192,6 +193,7 @@
                     })
                     return;
                 }
+                _g.openGlobalLoading();
                 setSensorStatusApi(setSensorId, setSensorVal, this.selectedAgentId, aimSdkPlugin).then((data) => {
                     handleResponse(data, (res) =>{
                         if(res.items[0].statusCode == "200"){
@@ -216,6 +218,7 @@
                     dangerMode: true,
                 }).then(function(willfunc){
                     if (willfunc) {
+                        _g.openGlobalLoading();
                         powerActionApi(cid, this.selectedDeviceId).then((data) => {
                             handleResponse(data, (res) => {
                                 if(data.result == true){

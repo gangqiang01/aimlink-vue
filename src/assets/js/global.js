@@ -18,6 +18,14 @@ const commonFn = {
         }, 0)
     },
 
+    setDeviceStatus(val){
+        store.dispatch('deviceConnect',val);
+    },
+
+    setSelectedDeviceAgent(val){
+        store.dispatch('selectDeviceAgent', val)
+    },
+
     swalWarnDo(subject){
         return swal({
             title: "Are you sure?",
@@ -43,6 +51,16 @@ const commonFn = {
             title: "Are you sure?",
             text: subject,
             icon: "error",
+            buttons: true,  
+            dangerMode: true,
+        })
+    },
+
+    swalInfoDo(subject){
+        return swal({
+            title: "Are you sure?",
+            text: subject,
+            icon: "info",
             buttons: true,  
             dangerMode: true,
         })

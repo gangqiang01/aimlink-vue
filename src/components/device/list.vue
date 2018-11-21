@@ -6,7 +6,7 @@
         <div class="m-t-20">
             <div class="panel-header">
                 Device Group:
-                <el-select v-model="selectValue" size="small" @change="groupChange">
+                <el-select v-model="selectValue" size="small">
                     <el-option
                     v-for="item in groupOptions"
                     :key="item.value"
@@ -86,7 +86,7 @@
             </div>
             <div class="m-t-10 fr">
                 <el-button v-loading="addLoading" size="small" @click="addDevice()" type="primary">Add</el-button>
-                <el-button v-loading="deleteLoading" size="small" @click="DeleteDevice()" type="primary">Delete</el-button>
+                <el-button v-loading="deleteLoading" size="small" @click="deleteDevice()" type="primary">Delete</el-button>
                 
             </div>
            
@@ -98,6 +98,7 @@
     import {getDeviceApi, deleteDeviceApi} from '../restfulapi/deviceapi'
     import {getDeviceGroupApi} from '../restfulapi/devicegroupapi'
     import handleResponse from '../restfulapi/handleresponse'
+    import {mapState} from 'vuex'
 
     export default{
         name: 'deviceList',
@@ -145,8 +146,8 @@
             },
 
             getAllDevices(){
-                let groupid = this.selectValue;
-                getDeviceApi(groupid, this.deviceKeyword).then((data) => {
+                _g.openGlobalLoading();
+                getDeviceApi(this.selectValue, this.deviceKeyword).then((data) => {
                     handleResponse(data, (res) => { 
                         this.deviceTableData = res.groups[0].devices;
                         this.dataCount = this.deviceTableData.length;
@@ -156,9 +157,7 @@
                     })
                 })
             },
-            groupChange(){
-                this.getAllDevices();
-            },
+
             confirmDelete(row){ 
                 console.log("rowdata:",row);
                 let dddata = {};
@@ -196,7 +195,7 @@
                 this.deviceList = this.deviceTableData.slice((currentPage-1)*this.limit,currentPage*this.limit)
             },
 
-            DeleteDevice(){
+            deleteDevice(){
                 if(!this.multipleTable){
                     swal("","Please selected data","info")
                     return;
@@ -236,6 +235,25 @@
         created(){
             this.getDeviceGroup();
         },
+
+        computed: {
+            ...mapState({
+                connectStatus: "connectStatus",
+            })
+        },
+
+        watch:{
+            connectStatus(val){
+                if(val){
+                    this.getAllDevices();
+                }
+            },
+            selectValue(){
+                this.getAllDevices();
+            }
+        }
+
+        
     }
 </script>
 <style lang='scss' scoped>

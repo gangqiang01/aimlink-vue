@@ -81,7 +81,6 @@
                 }
             },
             deviceMonitor(selectedAgentId, deviceId){
-                let cpuNowPercentage, memoryNowPercentage;
                 getDeviceStatusApi(deviceId, selectedAgentId, systemMonitorPlugin).then((data) =>{
                     handleResponse(data, (res)=>{
                         if(res.connected == false){
@@ -98,11 +97,11 @@
                                 }
                             ); 
                         }
-                        cpuNowPercentage = res.ProcessMonitor["System Monitor Info"]["e"][0].v;
+                        this.cpuNowPercentage = res.ProcessMonitor["System Monitor Info"]["e"][0].v;
                         let ToMemoryData = res.ProcessMonitor["System Monitor Info"]["e"][1].v
                         let NewMemoryData = res.ProcessMonitor["System Monitor Info"]["e"][2].v;
                         this.memoryNowPercentage = parseInt(NewMemoryData/ToMemoryData*100);
-                        this.cpudata.push(cpuNowPercentage);
+                        this.cpudata.push(this.cpuNowPercentage);
                         this.cpudata.shift();
                         this.memorydata.push(this.memoryNowPercentage);
                         this.memorydata.shift();

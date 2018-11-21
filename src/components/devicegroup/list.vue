@@ -138,6 +138,7 @@
 
         methods:{
             getDeviceGroup(){
+                _g.openGlobalLoading();
                 getDeviceGroupApi(this).then((data) => {
                     handleResponse(data, (res) => {
                         console.log("grouplist",res);
@@ -192,7 +193,6 @@
                             swal("", "Add group successfully", "success").then((val) =>{
                                 if(val){
                                     this.getDeviceGroup();
-                                    
                                 }
                             })
                         }

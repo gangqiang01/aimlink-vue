@@ -48,11 +48,6 @@
                 >
 
                 <el-table-column
-                type="selection"
-                min-width="55">
-                </el-table-column>
-
-                <el-table-column
                 label="Time Stamp"
                 prop="name"
                 min-width="120"
@@ -121,14 +116,14 @@
                 </el-pagination>
                 
             </div>
-           
+
         </div>
     </div>  
 </template>
 
 <script>
     import {getDeviceGroupApi} from '../restfulapi/devicegroupapi'
-    import {getDeviceCategoryApi, getEventMsgApi} from '../restfulapi/msgapi'
+    import {getDeviceCategoryApi, getEventMsgApi, deleteMsgApi} from '../restfulapi/msgapi'
     import handleResponse from '../restfulapi/handleresponse'
     import btnGroup from '@/common/btn-group'
     export default{
@@ -203,13 +198,7 @@
             },
 
             confirmDelete(row){ 
-                swal({
-                    title:'Are you sure?',
-                    text:'delete this Message',
-                    icon:'warning',
-                    buttons:true,
-                    dangerMode:true,
-                }).then((willDelete) => {
+                _g.swalWarningDo("delete this message").then((willDelete) => {
                     if(willDelete){
                        DeleteMsgApi(row.id).then((data) => {
                             handleResponse(data, (res) => {
@@ -232,13 +221,14 @@
 
             handleCurrentChange(currentPage){
                 this.currentPage = currentPage;
-                this.deviceGroupList = this.msgTableData.slice((currentPage-1)*this.limit,currentPage*this.limit)
+                this.messageList = this.msgTableData.slice((currentPage-1)*this.limit,currentPage*this.limit)
             },
 
             getEventMessages(){
                 if(this.severityValue == '' || this.groupValue == '' || this.categoryValue == ''){
                     return;
                 }
+                _g.openGlobalLoading();
                 getEventMsgApi(this.severityValue, this.groupValue, this.categoryValue).then((data) => {
                     handleResponse(data, (res) =>{
                         this.msgTableData = res.events;

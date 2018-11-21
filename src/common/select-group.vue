@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="text-center m-t-20">
-            <i class="fa fa-object-group fa-5x m-b-10"></i>
-            <p> Device Group</p>
-            <el-select v-model="groupValue" ref="groupId" class="m-t-10" size="small" @change="groupChange">
+            <i class="fa fa-object-group fa-5x m-b-10 deviceIcon"></i>
+            <p class="deviceTitle"> Device Group</p>
+            <el-select v-model="groupValue" ref="groupId" class="m-t-10" size="small">
                 <el-option
                     v-for="item in groupOptions"
                     :key="item.value"
@@ -13,8 +13,8 @@
             </el-select>  
         </div>
         <div class="text-center m-t-30">
-            <i class="fa fa-tablet fa-5x  m-b-10"></i>
-            <p>Device list</p>
+            <i class="fa fa-tablet fa-5x  m-b-10 deviceIcon" ></i>
+            <p class="deviceTitle">Device list</p>
             <el-select v-model="devValue" ref="devId" class="m-t-10" @change = "deviceChange" size="small">
                 <el-option-group
                 v-for="(devicegroup, key) in deviceOptions"
@@ -40,6 +40,7 @@
     import {getDeviceApi} from '../components/restfulapi/deviceapi'
     import {getDeviceGroupApi} from '../components/restfulapi/devicegroupapi'
     import handleResponse from '../components/restfulapi/handleresponse'
+    import {mapState} from 'vuex'
 
     export default{
         name: 'selectGroup',
@@ -62,19 +63,21 @@
                             groupData.forEach(function(val){
                                 groupOptionsData.push({value: val.gid, label:val.name})
                             }) 
-                            this.groupValue = groupData[0].gid;
-                            this.groupOptions = groupOptionsData
+                            if(localStorage.getItem("selectGroup")){
+                                this.groupValue = parseInt(localStorage.getItem("selectGroup"));  
+                            }else{
+                                this.groupValue = groupData[0].gid;
+                            }
+                            this.groupOptions = groupOptionsData;
                             this.getAllDevices();
                         }
                     })
                 })
             },
-            groupChange(){
-                this.getAllDevices();
-            },
+            
             getAllDevices(){
-                let groupid = this.groupValue;
-                getDeviceApi(groupid).then((data) => {
+                localStorage.setItem("selectGroup", this.groupValue);
+                getDeviceApi(this.groupValue).then((data) => {
                     handleResponse(data, (res) => {
                         let deviceData = res.groups[0].devices;
                         if(deviceData.length != 0){
@@ -90,7 +93,7 @@
                                 
                             }) 
                             this.deviceOptions = deviceOptionsData;
-                            let value = this.devValue;
+                            this.getSelectedDeviceAgent();
                         }else{
                             this.deviceOptions = [];
                         }
@@ -107,17 +110,48 @@
                        }
                    })
                 })
+                localStorage.setItem("selectDeviceAgent", val);
+                this.$emit("select-device",selectedDeviceObj);
+            },
 
-                this.$emit("select-device",selectedDeviceObj)
+            getSelectedDeviceAgent(){
+                if(!localStorage.getItem("selectDeviceAgent")){
+                    return;
+                }else{
+                    this.devValue = localStorage.getItem("selectDeviceAgent");
+                    this.deviceChange(this.devValue);
+                }
             }
 
         },
         created(){
-            this.getDeviceGroup();
+            this.getDeviceGroup(); 
         },
+        computed: {
+            ...mapState({
+                connectStatus: "connectStatus",
+            })
+        },
+
+        watch:{
+            connectStatus(val){
+                if(val){
+                    this.getAllDevices();
+                }
+            },
+            groupValue(){
+                this.getAllDevices()
+            }
+        }
     }
 </script>
 <style lang='scss' scoped>
-
+    @import "../assets/css/colors";
+    .deviceIcon{
+        color: $primary-color;
+    }
+    .deviceTitle{
+        // color: $
+    }
 </style>
 

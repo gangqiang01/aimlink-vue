@@ -33,6 +33,9 @@
                                                 <span>device: </span>{{item.agent_name}}
                                             </li>
                                             <li>
+                                                <span>account name:</span>{{item.account_name}}
+                                            </li>
+                                            <li>
                                                 <span>type:</span>{{item.type}}
                                             </li>
                                             <li>
@@ -81,7 +84,7 @@
                             <b>Last Accessed:</b>{{logintime}}
                         </el-dropdown-item>
                         <el-dropdown-item>
-                            <b>Device Bound:</b>{{devicecount}}
+                            <b>Device Connected:</b>{{devicecount}}
                         </el-dropdown-item>
                         <el-dropdown-item>
                             <el-button type="primary" size="small" class="fr" @click="loginout()">
@@ -225,8 +228,16 @@
                         msgOrgData = msgOrgData.map((val)=> {
                             return JSON.parse(val);
                         });
+                        msgOrgData.forEach((val) => {
+                            if(val.subtype === "DEVICE_CONNECTED"){
+                                _g.setDeviceStatus(true);
+                            }else if(val.subtype === "DEVICE_DISCONNECTED"){
+                                _g.setDeviceStatus(false)
+                            }
+                        })
                         that.msgData = that.msgData.concat(msgOrgData);
                         window.localStorage.setItem("msgData", JSON.stringify(that.msgData));
+
                     }
                 };
                 
@@ -252,6 +263,7 @@
                     let msgLocalData = localStorage.getItem('msgData');
                     msgLocalData = JSON.parse(msgLocalData);
                     this.msgData = msgLocalData;
+                    
                 }               
             },
             switchLang(lang){
