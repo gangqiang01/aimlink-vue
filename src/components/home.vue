@@ -98,17 +98,19 @@
     .wrapper{
         display: -webkit-flex;
         display: flex;
-        min-height: 100%;
+        height: 100vh;
         flex-flow: column nowrap;
-    
+        overflow: hidden;    
         .body{
             display: -webkit-flex;
             flex: 1;
-            min-height: 100%;
+            height: 100%;
             display: flex;
             flex-flow: row nowrap;
             .menu{
-                min-height: 100%; 
+                height: 100%; 
+                overflow-y: auto;
+                overflow-x: hidden;
                 width: $aside-width;
                 .el-menu-vertical:not(.el-menu--collapse) {
                     flex: 0 0 $aside-width;
@@ -129,6 +131,10 @@
             .content{
                 flex:1;
                 margin:10px;
+                margin-right: 0;
+                height: 100%;
+                overflow-y: auto;
+                overflow-x: hidden;
                 .fade-enter-actice, .fade-leave-active{
                     transition: opacity .5s
                 } 

@@ -161,7 +161,7 @@
     .msgContainer{
         max-height: 22rem;
         max-width: 20rem;
-        overflow-y: scroll;
+        overflow-y: auto;
         overflow-x: hidden;
     }
     .msgHeader{
